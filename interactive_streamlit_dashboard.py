@@ -1,6 +1,6 @@
 import pandas as pd
 import streamlit as st
-from datetime import datetime, timedelta
+from datetime import datetime
 
 # Load Google Sheet data (publicly accessible)
 sheet_url = "https://docs.google.com/spreadsheets/d/16U4reJDdvGQb6lqN9LF-A2QVwsJdNBV1CqqcyuHcHXk/export?format=csv&gid=2006560046"
@@ -21,38 +21,8 @@ st.title("📊 Interactive Dashboard with Weekly Tabs")
 st.markdown(
     '''
     Explore the data with today's data, weekly breakdowns, and Month-to-Date (MTD).
-    Use filters to refine results and download the filtered data.
     '''
 )
-
-# Sidebar filters
-st.sidebar.header("Filter Options")
-ac_name = st.sidebar.selectbox("Select AC Name:", ["All"] + data['AC Name'].unique().tolist())
-start_date = st.sidebar.date_input("Start Date:")
-end_date = st.sidebar.date_input("End Date:")
-
-# Filter data function
-def filter_and_sort_data(ac_name="All", start_date=None, end_date=None):
-    filtered_data = data.copy()
-
-    # Filter by AC Name if not "All"
-    if ac_name != "All":
-        filtered_data = filtered_data[filtered_data['AC Name'] == ac_name]
-
-    # Filter by date range if specified
-    if start_date and end_date:
-        filtered_data = filtered_data[
-            (filtered_data['Date'] >= pd.to_datetime(start_date)) &
-            (filtered_data['Date'] <= pd.to_datetime(end_date))
-        ]
-    
-    # Sort by Date
-    filtered_data = filtered_data.sort_values(by="Date")
-    
-    return filtered_data
-
-# Filter data
-filtered_data = filter_and_sort_data(ac_name, start_date, end_date)
 
 # Define week ranges for January
 def get_weekly_data(data):
@@ -74,16 +44,16 @@ def get_weekly_data(data):
         weekly_data.append((week_name, start_date, end_date, week_data))
     return weekly_data
 
-weekly_data = get_weekly_data(filtered_data)
+weekly_data = get_weekly_data(data)
 
 # Get today's data
 today = datetime.now().date()
-today_data = filtered_data[filtered_data['Date'] == pd.to_datetime(today)]
+today_data = data[data['Date'] == pd.to_datetime(today)]
 
 # Get MTD (Month-to-Date) data
-mtd_data = filtered_data[
-    (filtered_data['Date'].dt.month == 1) &
-    (filtered_data['Date'] <= pd.to_datetime(today))
+mtd_data = data[
+    (data['Date'].dt.month == 1) &
+    (data['Date'] <= pd.to_datetime(today))
 ]
 
 # Display tabs for Today, Weekly, and MTD
@@ -108,7 +78,7 @@ with tab_objects[-1]:
 
 # Download filtered data
 st.sidebar.markdown("### Download Filtered Data")
-csv = filtered_data.to_csv(index=False)
+csv = data.to_csv(index=False)
 st.sidebar.download_button(
     label="📥 Download Filtered Data as CSV",
     data=csv,
