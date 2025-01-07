@@ -81,12 +81,35 @@ mtd_data = filtered_data[
     (filtered_data['Date'] <= pd.to_datetime(today))  # Up to today
 ]
 
-# Display tabs for Today, Weekly, and MTD
-tabs = ["Today"] + [f"Week {i+1}" for i in range(len(weekly_data))] + ["MTD"]
+# Calculate Overall Performance
+def calculate_overall_performance(data):
+    if data.empty:
+        return {"Total Entries": 0, "Sum of Values": 0}
+    summary = {
+        "Total Entries": len(data),
+        "Sum of Values": data.select_dtypes(include=['number']).sum(numeric_only=True).to_dict()
+    }
+    return summary
+
+overall_performance = calculate_overall_performance(filtered_data)
+
+# Display tabs for Today, Weekly, MTD, and Overall Performance
+tabs = ["Overall Performance", "Today"] + [f"Week {i+1}" for i in range(len(weekly_data))] + ["MTD"]
 tab_objects = st.tabs(tabs)
 
-# Today tab
+# Overall Performance tab
 with tab_objects[0]:
+    st.markdown("### 📊 Overall Performance")
+    st.write(f"**Selected AC Name**: {selected_ac_name}")
+    st.write(f"**Total Entries**: {overall_performance['Total Entries']}")
+    if overall_performance['Total Entries'] > 0:
+        st.markdown("#### Sum of Numerical Columns:")
+        st.json(overall_performance["Sum of Values"])
+    else:
+        st.info("No data available for the selected filters.")
+
+# Today tab
+with tab_objects[1]:
     st.markdown(f"### 📅 Today's Data: {today.strftime('%Y-%m-%d')}")
     if today_data.empty:
         st.info("No data available for today.")
@@ -95,7 +118,7 @@ with tab_objects[0]:
 
 # Weekly tabs
 for i, (week_name, start_date, end_date, week_data) in enumerate(weekly_data):
-    with tab_objects[i + 1]:
+    with tab_objects[i + 2]:
         st.markdown(f"### 📅 {week_name}: {start_date} to {end_date}")
         if week_data.empty:
             st.info(f"No data available for {week_name}.")
