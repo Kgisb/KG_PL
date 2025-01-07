@@ -11,18 +11,32 @@ data['Date'] = pd.to_datetime(data['Date'])
 
 # Streamlit app configuration
 st.set_page_config(
-    page_title="Interactive Dashboard with Weekly Tabs",
+    page_title="Interactive Dashboard",
     page_icon="📊",
     layout="wide"
 )
 
-# Title and description
-st.title("📊 Interactive Dashboard with Weekly Tabs")
+# Header Banner
 st.markdown(
-    '''
-    Explore the data with today's data, weekly breakdowns, and Month-to-Date (MTD).
-    '''
+    """
+    <style>
+        .header-banner {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 8px;
+            text-align: center;
+            font-size: 24px;
+        }
+    </style>
+    <div class="header-banner">
+        📊 Interactive Dashboard - January Weekly Breakdown and MTD
+    </div>
+    """,
+    unsafe_allow_html=True
 )
+
+st.write("")  # Adds spacing
 
 # Define week ranges for January
 def get_weekly_data(data):
@@ -62,26 +76,25 @@ tab_objects = st.tabs(tabs)
 
 # Today tab
 with tab_objects[0]:
-    st.subheader(f"Today's Data: {today.strftime('%Y-%m-%d')}")
-    st.dataframe(today_data, use_container_width=True)
+    st.markdown(f"### 📅 Today's Data: {today.strftime('%Y-%m-%d')}")
+    if today_data.empty:
+        st.info("No data available for today.")
+    else:
+        st.dataframe(today_data, use_container_width=True)
 
 # Weekly tabs
 for i, (week_name, start_date, end_date, week_data) in enumerate(weekly_data):
     with tab_objects[i + 1]:
-        st.subheader(f"{week_name}: {start_date} to {end_date}")
-        st.dataframe(week_data, use_container_width=True)
+        st.markdown(f"### 📅 {week_name}: {start_date} to {end_date}")
+        if week_data.empty:
+            st.info(f"No data available for {week_name}.")
+        else:
+            st.dataframe(week_data, use_container_width=True)
 
 # MTD tab
 with tab_objects[-1]:
-    st.subheader("Month-to-Date (MTD) Data")
-    st.dataframe(mtd_data, use_container_width=True)
-
-# Download filtered data
-st.sidebar.markdown("### Download Filtered Data")
-csv = data.to_csv(index=False)
-st.sidebar.download_button(
-    label="📥 Download Filtered Data as CSV",
-    data=csv,
-    file_name="filtered_data.csv",
-    mime="text/csv",
-)
+    st.markdown("### 📅 Month-to-Date (MTD) Data")
+    if mtd_data.empty:
+        st.info("No data available for Month-to-Date.")
+    else:
+        st.dataframe(mtd_data, use_container_width=True)
