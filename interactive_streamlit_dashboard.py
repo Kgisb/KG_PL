@@ -1,6 +1,7 @@
 import pandas as pd
 import streamlit as st
 from datetime import datetime
+import plotly.graph_objects as go
 
 # Load Google Sheet data (publicly accessible)
 sheet_url = "https://docs.google.com/spreadsheets/d/16U4reJDdvGQb6lqN9LF-A2QVwsJdNBV1CqqcyuHcHXk/export?format=csv&gid=2006560046"
@@ -29,17 +30,23 @@ st.markdown(
             font-size: 24px;
             font-weight: bold;
         }
-        .performance-box {
+        .metric-box {
             background-color: #f9f9f9;
-            padding: 15px;
+            padding: 20px;
             border-radius: 8px;
             border: 1px solid #ddd;
+            text-align: center;
             box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.1);
         }
-        .summary-title {
+        .metric-title {
             font-size: 18px;
             font-weight: bold;
             color: #333;
+        }
+        .metric-value {
+            font-size: 22px;
+            font-weight: bold;
+            color: #007BFF;
         }
     </style>
     <div class="header-banner">
@@ -83,51 +90,87 @@ filtered_data = filtered_data[
     (filtered_data['Date'] <= pd.to_datetime(end_date))
 ]
 
-# Calculate Overall Performance
-def calculate_overall_performance(data):
-    if data.empty:
-        return {"Total Entries": 0, "Sum of Values": 0}
-    summary = {
-        "Total Entries": len(data),
-        "Sum of Values": data.select_dtypes(include=['number']).sum(numeric_only=True).to_dict()
-    }
-    return summary
+# Define Target and Achievements
+cash_in_target = 100000  # Example target
+cash_in_achievement = filtered_data['Cash-in'].sum() if 'Cash-in' in filtered_data.columns else 0
 
-overall_performance = calculate_overall_performance(filtered_data)
+enrollment_target = 50  # Example target
+enrollment_achievement = filtered_data['Enrollment'].sum() if 'Enrollment' in filtered_data.columns else 0
 
-# Display Overall Performance
+sgr_target = 4  # Example target
+sgr_achievement = filtered_data['SGR Conversion'].sum() if 'SGR Conversion' in filtered_data.columns else 0
+
+# Function to create pie chart
+def create_pie_chart(target, achievement, title):
+    labels = ["Achieved", "Remaining"]
+    values = [achievement, max(0, target - achievement)]
+
+    fig = go.Figure(data=[go.Pie(labels=labels, values=values, hole=0.5)])
+    fig.update_layout(
+        title=title,
+        annotations=[dict(text=f"{achievement/target:.0%}", showarrow=False, font_size=20)],
+        showlegend=True,
+    )
+    return fig
+
+# Overall Performance Display
 st.markdown("### 📊 Overall Performance")
-st.write(f"**Selected AC Name**: {selected_ac_name}")
-st.write(f"**Selected Time Period**: {selected_time} ({start_date} to {end_date})")
 
-# Stylish box for summary
-st.markdown(
-    f"""
-    <div class="performance-box">
-        <p class="summary-title">Total Entries: {overall_performance['Total Entries']}</p>
-        <p class="summary-title">Sum of Numerical Columns:</p>
-        <ul>
-    """,
-    unsafe_allow_html=True,
-)
-if overall_performance['Total Entries'] > 0:
-    for col, val in overall_performance['Sum of Values'].items():
-        st.markdown(f"- **{col}:** {val}")
-else:
-    st.info("No data available for the selected filters.")
+# Cash-in Performance
+col1, col2 = st.columns([1, 1])
+with col1:
+    st.markdown(
+        f"""
+        <div class="metric-box">
+            <p class="metric-title">Cash-in Target</p>
+            <p class="metric-value">{cash_in_target}</p>
+            <p class="metric-title">Cash-in Achievement</p>
+            <p class="metric-value">{cash_in_achievement}</p>
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
+with col2:
+    st.plotly_chart(create_pie_chart(cash_in_target, cash_in_achievement, "Cash-in Achievement"), use_container_width=True)
 
-# Detailed data with expander
+# Enrollment Performance
+col3, col4 = st.columns([1, 1])
+with col3:
+    st.markdown(
+        f"""
+        <div class="metric-box">
+            <p class="metric-title">Enrollment Target</p>
+            <p class="metric-value">{enrollment_target}</p>
+            <p class="metric-title">Enrollment Achievement</p>
+            <p class="metric-value">{enrollment_achievement}</p>
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
+with col4:
+    st.plotly_chart(create_pie_chart(enrollment_target, enrollment_achievement, "Enrollment Achievement"), use_container_width=True)
+
+# SGR Conversion Performance
+col5, col6 = st.columns([1, 1])
+with col5:
+    st.markdown(
+        f"""
+        <div class="metric-box">
+            <p class="metric-title">SGR Conversion Target</p>
+            <p class="metric-value">{sgr_target}</p>
+            <p class="metric-title">SGR Conversion Achievement</p>
+            <p class="metric-value">{sgr_achievement}</p>
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
+with col6:
+    st.plotly_chart(create_pie_chart(sgr_target, sgr_achievement, "SGR Conversion Achievement"), use_container_width=True)
+
+# Filtered Data with Expander
 with st.expander("🔍 View Filtered Data"):
     st.markdown("### Filtered Data")
     if filtered_data.empty:
         st.info("No data available for the selected filters.")
     else:
         st.dataframe(filtered_data, use_container_width=True)
-
-# Detailed stats with expander
-with st.expander("📊 View Detailed Summary Statistics"):
-    st.markdown("### Detailed Summary Statistics")
-    if filtered_data.empty:
-        st.info("No data available for the selected filters.")
-    else:
-        st.dataframe(filtered_data.describe(include='all'), use_container_width=True)
