@@ -138,7 +138,7 @@ for idx, (target_col, achievement_col) in enumerate(target_columns.items()):
             f"""
             <div class="metric-box">
                 <p class="metric-title">{target_col.split(' Target')[0]}</p>
-                <p class="metric-value">{achievement_value} / {target_value}</p>
+                <p class="metric-value">{achievement_value:,.0f} / {target_value:,.0f}</p>
                 <p class="metric-title">Achievement</p>
                 <p class="metric-value">{achievement_percentage:.0f}%</p>
             </div>
@@ -160,7 +160,7 @@ with col3:
         </div>
         <div class="metric-box">
             <p class="metric-title">TS</p>
-            <p class="metric-value">{ts}</p>
+            <p class="metric-value">{ts:,.0f}</p>
         </div>
         """,
         unsafe_allow_html=True,
@@ -174,7 +174,7 @@ with col4:
         </div>
         <div class="metric-box">
             <p class="metric-title">TD</p>
-            <p class="metric-value">{td}</p>
+            <p class="metric-value">{td:,.0f}</p>
         </div>
         """,
         unsafe_allow_html=True,
@@ -186,4 +186,4 @@ with st.expander("🔍 View Filtered Data"):
     if filtered_data.empty:
         st.info("No data available for the selected filters.")
     else:
-        st.dataframe(filtered_data, use_container_width=True)
+        st.dataframe(filtered_data.style.format("{:,}"), use_container_width=True)
