@@ -54,49 +54,55 @@ def filter_and_sort_data(ac_name="All", start_date=None, end_date=None):
 # Filter data
 filtered_data = filter_and_sort_data(ac_name, start_date, end_date)
 
-# Function to split data into MTD and weekly buckets
-def split_into_weeks(data):
-    current_month = datetime.now().month
-    mtd_data = data[data['Date'].dt.month == current_month]
-
-    # Define week ranges
-    start_of_month = mtd_data['Date'].min()
+# Define week ranges for January
+def get_weekly_data(data):
+    january = data[data['Date'].dt.month == 1]  # Filter data for January
     week_ranges = [
-        (start_of_month, start_of_month + timedelta(days=5)),
-        (start_of_month + timedelta(days=6), start_of_month + timedelta(days=12)),
-        (start_of_month + timedelta(days=13), start_of_month + timedelta(days=19)),
-        (start_of_month + timedelta(days=20), start_of_month + timedelta(days=26)),
-        (start_of_month + timedelta(days=27), mtd_data['Date'].max())
+        ("WK 1", "2025-01-01", "2025-01-06"),
+        ("WK 2", "2025-01-07", "2025-01-13"),
+        ("WK 3", "2025-01-14", "2025-01-20"),
+        ("WK 4", "2025-01-21", "2025-01-27"),
+        ("WK 5", "2025-01-28", "2025-01-31"),
     ]
 
-    weeks = []
-    for start, end in week_ranges:
-        week_data = mtd_data[(mtd_data['Date'] >= start) & (mtd_data['Date'] <= end)]
-        weeks.append((start, end, week_data))
-    return mtd_data, weeks
+    weekly_data = []
+    for week_name, start_date, end_date in week_ranges:
+        week_data = january[
+            (january['Date'] >= pd.to_datetime(start_date)) &
+            (january['Date'] <= pd.to_datetime(end_date))
+        ]
+        weekly_data.append((week_name, start_date, end_date, week_data))
+    return weekly_data
 
-mtd_data, weekly_data = split_into_weeks(filtered_data)
+weekly_data = get_weekly_data(filtered_data)
 
-# Filter data for today's date
+# Get today's data
 today = datetime.now().date()
 today_data = filtered_data[filtered_data['Date'] == pd.to_datetime(today)]
 
-# Display tabs for Today, weekly data, and MTD
-tab1, tab2, tab3, tab4, tab5, tab6, tab7 = st.tabs(["Today", "Week 1", "Week 2", "Week 3", "Week 4", "Week 5", "MTD"])
+# Get MTD (Month-to-Date) data
+mtd_data = filtered_data[
+    (filtered_data['Date'].dt.month == 1) &
+    (filtered_data['Date'] <= pd.to_datetime(today))
+]
+
+# Display tabs for Today, Weekly, and MTD
+tabs = ["Today"] + [f"Week {i+1}" for i in range(len(weekly_data))] + ["MTD"]
+tab_objects = st.tabs(tabs)
 
 # Today tab
-with tab1:
+with tab_objects[0]:
     st.subheader(f"Today's Data: {today.strftime('%Y-%m-%d')}")
     st.dataframe(today_data, use_container_width=True)
 
 # Weekly tabs
-for i, (start, end, week_data) in enumerate(weekly_data):
-    with [tab2, tab3, tab4, tab5, tab6][i]:
-        st.subheader(f"Week {i + 1}: {start.strftime('%Y-%m-%d')} to {end.strftime('%Y-%m-%d')}")
+for i, (week_name, start_date, end_date, week_data) in enumerate(weekly_data):
+    with tab_objects[i + 1]:
+        st.subheader(f"{week_name}: {start_date} to {end_date}")
         st.dataframe(week_data, use_container_width=True)
 
 # MTD tab
-with tab7:
+with tab_objects[-1]:
     st.subheader("Month-to-Date (MTD) Data")
     st.dataframe(mtd_data, use_container_width=True)
 
