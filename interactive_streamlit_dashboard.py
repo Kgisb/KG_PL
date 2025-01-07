@@ -38,6 +38,17 @@ st.markdown(
 
 st.write("")  # Adds spacing
 
+# Sidebar for AC Name filter
+st.sidebar.header("Filter Options")
+ac_names = ["ALL"] + sorted(data['AC Name'].dropna().unique().tolist())
+selected_ac_name = st.sidebar.selectbox("Select AC Name", ac_names)
+
+# Filter data by AC Name
+if selected_ac_name != "ALL":
+    filtered_data = data[data['AC Name'] == selected_ac_name]
+else:
+    filtered_data = data
+
 # Define week ranges for January
 def get_weekly_data(data):
     january = data[data['Date'].dt.month == 1]  # Filter data for January
@@ -58,16 +69,16 @@ def get_weekly_data(data):
         weekly_data.append((week_name, start_date, end_date, week_data))
     return weekly_data
 
-weekly_data = get_weekly_data(data)
+weekly_data = get_weekly_data(filtered_data)
 
 # Get today's data
 today = datetime.now().date()
-today_data = data[data['Date'] == pd.to_datetime(today)]
+today_data = filtered_data[filtered_data['Date'] == pd.to_datetime(today)]
 
 # Get MTD (Month-to-Date) data
-mtd_data = data[
-    (data['Date'].dt.month == 1) &  # January data
-    (data['Date'] <= pd.to_datetime(today))  # Up to today
+mtd_data = filtered_data[
+    (filtered_data['Date'].dt.month == 1) &  # January data
+    (filtered_data['Date'] <= pd.to_datetime(today))  # Up to today
 ]
 
 # Display tabs for Today, Weekly, and MTD
