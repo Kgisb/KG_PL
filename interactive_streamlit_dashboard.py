@@ -240,7 +240,10 @@ with compare_tab:
     sort_by = st.selectbox("Sort by", options=["Cash-in", "SGR Conversion"], index=0)
     compare_data = compare_data.sort_values(by=sort_by, ascending=False)
 
-    # Display the sorted table
+    # Display the sorted table without default indexing
     st.markdown('<div class="table-container">', unsafe_allow_html=True)
+    st.table(compare_data.style.hide_index())  # Hides the default index
+    st.markdown('</div>', unsafe_allow_html=True)
+
     st.table(compare_data)
     st.markdown('</div>', unsafe_allow_html=True)
