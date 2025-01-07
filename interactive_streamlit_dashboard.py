@@ -239,7 +239,8 @@ with compare_tab:
     compare_data["Cash-in"] = compare_data["Cash-in"].apply(lambda x: f"{x:,.0f}")
     compare_data["SGR Conversion"] = compare_data["SGR Conversion"].apply(lambda x: f"{x:,.0f}")
 
-    # Display the table
+    # Display the table without the index
     st.markdown('<div class="table-container">', unsafe_allow_html=True)
-    st.table(compare_data)
+    st.table(compare_data.style.hide_index())  # Hide the DataFrame index
     st.markdown('</div>', unsafe_allow_html=True)
+
