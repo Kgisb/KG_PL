@@ -127,9 +127,9 @@ l2p = (
 ts = filtered_data['TS'].sum() if 'TS' in filtered_data.columns else 0
 td = filtered_data['TD'].sum() if 'TD' in filtered_data.columns else 0
 
-# Overall Lead-to-TD and Overall Lead-to-TS
-lead_to_td = (td / overall_leads * 100) if overall_leads > 0 else 0
-lead_to_ts = (ts / overall_leads * 100) if overall_leads > 0 else 0
+# Lead-to-TD and TD-to-Enrl
+lead_to_td = int(td / overall_leads) if overall_leads > 0 else 0
+td_to_enrl = int(enrl / overall_leads) if overall_leads > 0 else 0
 
 # Display Target vs. Achievement
 st.markdown('<div class="section-header">Target vs. Achievement</div>', unsafe_allow_html=True)
@@ -175,8 +175,8 @@ with col3:
             <p class="metric-value">{ts:,.0f}</p>
         </div>
         <div class="metric-box">
-            <p class="metric-title">Lead-to-TS</p>
-            <p class="metric-value">{lead_to_ts:.2f}%</p>
+            <p class="metric-title">Lead-to-TD</p>
+            <p class="metric-value">{lead_to_td}</p>
         </div>
         """,
         unsafe_allow_html=True,
@@ -193,8 +193,8 @@ with col4:
             <p class="metric-value">{td:,.0f}</p>
         </div>
         <div class="metric-box">
-            <p class="metric-title">Lead-to-TD</p>
-            <p class="metric-value">{lead_to_td:.2f}%</p>
+            <p class="metric-title">TD-to-Enrl</p>
+            <p class="metric-value">{td_to_enrl}</p>
         </div>
         """,
         unsafe_allow_html=True,
