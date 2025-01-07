@@ -88,7 +88,7 @@ st.markdown(
  # Dashboard Tab
 with dashboard_tab:
     # Header Banner
-    st.markdown('<div class="header-banner">📊 Interactive Dashboard</div>', unsafe_allow_html=True)
+    st.markdown('<div class="header-banner">📊 JetLearn Interactive Dashboard</div>', unsafe_allow_html=True)
 
     # Sidebar for Filters
     st.sidebar.header("Filter Options")
