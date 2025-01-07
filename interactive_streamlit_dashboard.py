@@ -232,6 +232,10 @@ with compare_tab:
         unsafe_allow_html=True,
     )
 
+   # Compare Tab
+with compare_tab:
+    st.markdown('<h3>Comparison Metrics</h3>', unsafe_allow_html=True)
+
     # Prepare data for comparison
     compare_data = filtered_data.groupby("AC Name")[["Cash-in", "SGR Conversion"]].sum().reset_index()
 
@@ -239,34 +243,5 @@ with compare_tab:
     compare_data["Cash-in"] = compare_data["Cash-in"].apply(lambda x: f"{x:,.0f}")
     compare_data["SGR Conversion"] = compare_data["SGR Conversion"].apply(lambda x: f"{x:,.0f}")
 
-    # Sort by Cash-in by default (descending order)
-    compare_data = compare_data.sort_values(by="Cash-in", ascending=False).reset_index(drop=True)
-
-    # Add a sort selector with styling
-    st.markdown('<p style="font-size: 14px; font-weight: bold; margin-bottom: 5px;">Sort by:</p>', unsafe_allow_html=True)
-    sort_by = st.selectbox(
-        "",  # No label for cleaner layout
-        options=["Cash-in", "SGR Conversion"],
-        index=0,
-        key="compare_sort_selector"
-    )
-    compare_data = compare_data.sort_values(by=sort_by, ascending=False).reset_index(drop=True)
-
-    # Responsive Table Design
-    st.markdown('<div class="table-container" style="overflow-x: auto;">', unsafe_allow_html=True)
-    st.dataframe(
-        compare_data.style.set_table_styles(
-            [
-                {
-                    "selector": "th",
-                    "props": [("background-color", "#1E90FF"), ("color", "white"), ("font-weight", "bold"), ("text-align", "center")],
-                },
-                {
-                    "selector": "td",
-                    "props": [("text-align", "center"), ("padding", "10px")],
-                },
-            ]
-        ),
-        use_container_width=True,
-    )
-    st.markdown('</div>', unsafe_allow_html=True)
+    # Display table with built-in sorting (click column headers)
+    st.dataframe(compare_data, use_container_width=True)
