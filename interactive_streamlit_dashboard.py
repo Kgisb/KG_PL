@@ -234,17 +234,16 @@ with compare_tab:
     # Sort by Cash-in by default (descending order)
     compare_data = compare_data.sort_values(by="Cash-in", ascending=False).reset_index(drop=True)
 
-    # Add numbering column
-    compare_data.index += 1
-    compare_data.reset_index(inplace=True)
-    compare_data.rename(columns={"index": "#"}, inplace=True)
+    # Add numbering column for clean view
+    compare_data.insert(0, "#", range(1, 1 + len(compare_data)))
 
     # Add a sort selector
     sort_by = st.selectbox("Sort by", options=["Cash-in", "SGR Conversion"], index=0)
     compare_data = compare_data.sort_values(by=sort_by, ascending=False).reset_index(drop=True)
+    compare_data["#"] = range(1, 1 + len(compare_data))  # Reassign numbering based on the new order
 
     # Display the sorted table
     st.markdown('<div class="table-container">', unsafe_allow_html=True)
-    st.table(compare_data)  # Display the table
+    st.table(compare_data)  # Display the cleaned table
     st.markdown('</div>', unsafe_allow_html=True)
 
