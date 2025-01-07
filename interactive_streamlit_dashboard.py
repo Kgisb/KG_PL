@@ -210,8 +210,7 @@ with dashboard_tab:
 
     # Add View Filtered Data Option
     with st.expander("🔍 View Filtered Data"):
-        st.markdown
-            "### Filtered Data")
+        st.markdown"### Filtered Data")
         if filtered_data.empty:
             st.info("No data available for the selected filters.")
         else:
