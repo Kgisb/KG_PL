@@ -65,10 +65,7 @@ today = datetime.now().date()
 today_data = data[data['Date'] == pd.to_datetime(today)]
 
 # Get MTD (Month-to-Date) data
-mtd_data = data[
-    (data['Date'].dt.month == 1) &
-    (data['Date'] <= pd.to_datetime(today))
-]
+mtd_data = data[data['Date'].dt.month == 1]  # Full data for January
 
 # Display tabs for Today, Weekly, and MTD
 tabs = ["Today"] + [f"Week {i+1}" for i in range(len(weekly_data))] + ["MTD"]
