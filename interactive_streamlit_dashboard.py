@@ -208,4 +208,8 @@ with compare_tab:
     st.markdown('<div class="section-header">Comparison Metrics</div>', unsafe_allow_html=True)
     compare_data = filtered_data.groupby("AC Name")[["Cash-in", "SGR Conversion"]].sum().reset_index()
     compare_data["Cash-in"] = compare_data["Cash-in"].apply(lambda x: f"{x:,.0f}")
-    compare_data["SGR Conversion"] = compare_data["SGR Conversion"].apply(lambda
+    compare_data["SGR Conversion"] = compare_data["SGR Conversion"].apply(lambda x: f"{x:,.0f}")
+    st.markdown('<div class="table-container">', unsafe_allow_html=True)
+    st.table(compare_data)
+    st.markdown('</div>', unsafe_allow_html=True)
+   
