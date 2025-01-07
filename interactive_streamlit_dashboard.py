@@ -28,29 +28,67 @@ st.set_page_config(
 tabs = st.tabs(["Dashboard", "Compare"])
 dashboard_tab, compare_tab = tabs
 
+# Global Styling
+st.markdown(
+    """
+    <style>
+        .header-banner {
+            background-color: #1E90FF;
+            color: white;
+            padding: 15px 20px;
+            border-radius: 8px;
+            text-align: center;
+            font-size: 26px;
+            font-weight: bold;
+            margin-bottom: 20px;
+        }
+        .section-header {
+            color: #333333;
+            font-size: 22px;
+            font-weight: bold;
+            margin-top: 20px;
+            margin-bottom: 10px;
+        }
+        .metric-box {
+            background-color: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            border: 1px solid #ddd;
+            text-align: center;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            margin: 10px 0;
+        }
+        .metric-title {
+            font-size: 18px;
+            font-weight: bold;
+            color: #555555;
+            margin-bottom: 5px;
+        }
+        .metric-value {
+            font-size: 28px;
+            font-weight: bold;
+            color: #007BFF;
+        }
+        .divider {
+            height: 2px;
+            background-color: #e0e0e0;
+            margin: 20px 0;
+        }
+        .table-container {
+            background-color: #ffffff;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+    </style>
+    """,
+    unsafe_allow_html=True
+)
+
 # Dashboard Tab
 with dashboard_tab:
     # Header Banner
-    st.markdown(
-        """
-        <style>
-            .header-banner {
-                background-color: #1E90FF;
-                color: white;
-                padding: 15px 20px;
-                border-radius: 8px;
-                text-align: center;
-                font-size: 26px;
-                font-weight: bold;
-                margin-bottom: 20px;
-            }
-        </style>
-        <div class="header-banner">
-            📊 Interactive Dashboard
-        </div>
-        """,
-        unsafe_allow_html=True
-    )
+    st.markdown('<div class="header-banner">📊 Interactive Dashboard</div>', unsafe_allow_html=True)
 
     # Sidebar for Filters
     st.sidebar.header("Filter Options")
@@ -85,20 +123,7 @@ with dashboard_tab:
     enrl = filtered_data['Enrl'].sum() if 'Enrl' in filtered_data.columns else 0
     overall_leads = filtered_data['Overall Leads'].sum() if 'Overall Leads' in filtered_data.columns else 0
     sgr_conversion = filtered_data['SGR Conversion'].sum() if 'SGR Conversion' in filtered_data.columns else 0
-    sgr_leads = filtered_data['SGR Leads'].sum() if 'SGR Leads' in filtered_data.columns else 0
     cash_in = filtered_data['Cash-in'].sum() if 'Cash-in' in filtered_data.columns else 0
-
-    # MLMC% and L2P%
-    mlmc = (enrl / overall_leads * 100) if overall_leads > 0 else 0
-    l2p = (
-        (enrl - sgr_conversion) / (overall_leads - sgr_leads) * 100
-        if (overall_leads - sgr_leads) > 0
-        else 0
-    )
-
-    # TS and TD
-    ts = filtered_data['TS'].sum() if 'TS' in filtered_data.columns else 0
-    td = filtered_data['TD'].sum() if 'TD' in filtered_data.columns else 0
 
     # Display Target vs. Achievement
     st.markdown('<div class="section-header">Target vs. Achievement</div>', unsafe_allow_html=True)
@@ -127,48 +152,12 @@ with dashboard_tab:
                 unsafe_allow_html=True,
             )
 
-    # Display Key Metrics
-    st.markdown('<div class="divider"></div>', unsafe_allow_html=True)
-    st.markdown('<div class="section-header">Key Performance Metrics</div>', unsafe_allow_html=True)
-
-    col3, col4 = st.columns(2)
-    with col3:
-        st.markdown(
-            f"""
-            <div class="metric-box">
-                <p class="metric-title">Cash-in</p>
-                <p class="metric-value">{cash_in:,.0f}</p>
-            </div>
-            <div class="metric-box">
-                <p class="metric-title">MLMC%</p>
-                <p class="metric-value">{int(mlmc)}%</p>
-            </div>
-            """,
-            unsafe_allow_html=True,
-        )
-    with col4:
-        st.markdown(
-            f"""
-            <div class="metric-box">
-                <p class="metric-title">L2P%</p>
-                <p class="metric-value">{int(l2p)}%</p>
-            </div>
-            <div class="metric-box">
-                <p class="metric-title">TS</p>
-                <p class="metric-value">{ts:,.0f}</p>
-            </div>
-            <div class="metric-box">
-                <p class="metric-title">TD</p>
-                <p class="metric-value">{td:,.0f}</p>
-            </div>
-            """,
-            unsafe_allow_html=True,
-        )
-
 # Compare Tab
 with compare_tab:
     st.markdown('<div class="section-header">Comparison Metrics</div>', unsafe_allow_html=True)
     compare_data = filtered_data.groupby("AC Name")[["Cash-in", "SGR Conversion"]].sum().reset_index()
     compare_data["Cash-in"] = compare_data["Cash-in"].apply(lambda x: f"{x:,.0f}")
     compare_data["SGR Conversion"] = compare_data["SGR Conversion"].apply(lambda x: f"{x:,.0f}")
+    st.markdown('<div class="table-container">', unsafe_allow_html=True)
     st.table(compare_data)
+    st.markdown('</div>', unsafe_allow_html=True)
