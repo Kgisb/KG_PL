@@ -232,7 +232,7 @@ with compare_tab:
         unsafe_allow_html=True,
     )
 
-  # Compare Tab
+# Compare Tab
 with compare_tab:
     # Prepare data for comparison
     compare_data = filtered_data.groupby("AC Name")[["Cash-in", "SGR Conversion"]].sum().reset_index()
@@ -241,9 +241,10 @@ with compare_tab:
     compare_data["Cash-in"] = compare_data["Cash-in"].apply(lambda x: f"{x:,.0f}")
     compare_data["SGR Conversion"] = compare_data["SGR Conversion"].apply(lambda x: f"{x:,.0f}")
 
-    # Reset index and remove the default index column
+    # Reset index to remove default indexing
     compare_data = compare_data.reset_index(drop=True)
 
     # Display table with built-in sorting (click column headers)
     st.dataframe(compare_data, use_container_width=True)
+
 
