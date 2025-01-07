@@ -108,7 +108,7 @@ def create_pie_chart(target, achievement, title):
     fig = go.Figure(data=[go.Pie(labels=labels, values=values, hole=0.5)])
     fig.update_layout(
         title=title,
-        annotations=[dict(text=f"{achievement/target:.0%}", showarrow=False, font_size=20)],
+        annotations=[dict(text=f"{(achievement / target) * 100:.0f}%", showarrow=False, font_size=20)],
         showlegend=True,
     )
     return fig
