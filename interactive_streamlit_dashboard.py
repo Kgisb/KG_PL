@@ -85,38 +85,20 @@ st.markdown(
     unsafe_allow_html=True
 )
 
+ # Dashboard Tab
 with dashboard_tab:
-    # Styled Header Banner
-    st.markdown(
-        """
-        <div class="header-banner">
-            📊 <span style="color: white;">Interactive Dashboard</span>
-        </div>
-        """,
-        unsafe_allow_html=True,
-    )
+    # Header Banner
+    st.markdown('<div class="header-banner">📊 Interactive Dashboard</div>', unsafe_allow_html=True)
 
-    # Sidebar Filters Section
-    st.sidebar.markdown(
-        """
-        <div style="background-color: #f0f8ff; padding: 10px; border-radius: 8px; box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1);">
-            <h4 style="color: #1E90FF; text-align: center;">🔍 Filter Options</h4>
-        </div>
-        """,
-        unsafe_allow_html=True,
-    )
-
-    # AC Name Filter
-    st.sidebar.markdown("<p style='font-size: 14px; font-weight: bold;'>Select AC Name:</p>", unsafe_allow_html=True)
+    # Sidebar for Filters
+    st.sidebar.header("Filter Options")
     ac_names = ["ALL"] + sorted(data['AC Name'].dropna().unique().tolist())
-    selected_ac_name = st.sidebar.selectbox("", ac_names)
+    selected_ac_name = st.sidebar.selectbox("Select AC Name", ac_names)
 
-    # Time Period Filter
-    st.sidebar.markdown("<p style='font-size: 14px; font-weight: bold;'>Select Time Period:</p>", unsafe_allow_html=True)
     time_options = ["Today", "WK 1", "WK 2", "WK 3", "WK 4", "WK 5", "MTD"]
-    selected_time = st.sidebar.selectbox("", time_options)
+    selected_time = st.sidebar.selectbox("Select Time Period", time_options)
 
-    # Define Time Ranges
+    # Define time ranges
     time_ranges = {
         "Today": (datetime.now().date(), datetime.now().date()),
         "WK 1": ("2025-01-01", "2025-01-06"),
@@ -127,28 +109,15 @@ with dashboard_tab:
         "MTD": ("2025-01-01", datetime.now().date()),
     }
 
-    # Filter Data Based on Time Range and AC Name
     start_date, end_date = time_ranges[selected_time]
     filtered_data = data[
-        (data['Date'] >= pd.to_datetime(start_date)) & 
+        (data['Date'] >= pd.to_datetime(start_date)) &
         (data['Date'] <= pd.to_datetime(end_date))
     ]
 
+    # Filter data by AC Name
     if selected_ac_name != "ALL":
         filtered_data = filtered_data[filtered_data['AC Name'] == selected_ac_name]
-
-    # Summary Section
-    st.markdown('<div class="section-header">Summary</div>', unsafe_allow_html=True)
-    total_rows = len(filtered_data)
-    st.markdown(
-        f"""
-        <div style="padding: 15px; background-color: #f8f9fa; border: 1px solid #ddd; border-radius: 8px; margin-top: 10px; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);">
-            <p style="font-size: 16px; font-weight: bold; margin-bottom: 5px; color: #007BFF;">Total Records:</p>
-            <p style="font-size: 24px; font-weight: bold; margin: 0;">{total_rows}</p>
-        </div>
-        """,
-        unsafe_allow_html=True,
-    )
 
     # Calculate metrics
     enrl = filtered_data['Enrl'].sum() if 'Enrl' in filtered_data.columns else 0
