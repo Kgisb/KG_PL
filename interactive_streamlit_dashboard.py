@@ -38,10 +38,14 @@ st.markdown(
 
 st.write("")  # Adds spacing
 
-# Sidebar for AC Name filter
+# Sidebar for Filters
 st.sidebar.header("Filter Options")
 ac_names = ["ALL"] + sorted(data['AC Name'].dropna().unique().tolist())
 selected_ac_name = st.sidebar.selectbox("Select AC Name", ac_names)
+
+# Week and MTD filter options
+time_options = ["Today", "WK 1", "WK 2", "WK 3", "WK 4", "WK 5", "MTD"]
+selected_time = st.sidebar.selectbox("Select Time Period", time_options)
 
 # Filter data by AC Name
 if selected_ac_name != "ALL":
@@ -49,36 +53,21 @@ if selected_ac_name != "ALL":
 else:
     filtered_data = data
 
-# Define week ranges for January
-def get_weekly_data(data):
-    january = data[data['Date'].dt.month == 1]  # Filter data for January
-    week_ranges = [
-        ("WK 1", "2025-01-01", "2025-01-06"),  # 1st - 6th
-        ("WK 2", "2025-01-07", "2025-01-13"),  # 7th - 13th
-        ("WK 3", "2025-01-14", "2025-01-20"),  # 14th - 20th
-        ("WK 4", "2025-01-21", "2025-01-27"),  # 21st - 27th
-        ("WK 5", "2025-01-28", "2025-01-31"),  # 28th - 31st
-    ]
+# Define time ranges
+time_ranges = {
+    "Today": (datetime.now().date(), datetime.now().date()),
+    "WK 1": ("2025-01-01", "2025-01-06"),
+    "WK 2": ("2025-01-07", "2025-01-13"),
+    "WK 3": ("2025-01-14", "2025-01-20"),
+    "WK 4": ("2025-01-21", "2025-01-27"),
+    "WK 5": ("2025-01-28", "2025-01-31"),
+    "MTD": ("2025-01-01", datetime.now().date()),
+}
 
-    weekly_data = []
-    for week_name, start_date, end_date in week_ranges:
-        week_data = january[
-            (january['Date'] >= pd.to_datetime(start_date)) &
-            (january['Date'] <= pd.to_datetime(end_date))
-        ]
-        weekly_data.append((week_name, start_date, end_date, week_data))
-    return weekly_data
-
-weekly_data = get_weekly_data(filtered_data)
-
-# Get today's data
-today = datetime.now().date()
-today_data = filtered_data[filtered_data['Date'] == pd.to_datetime(today)]
-
-# Get MTD (Month-to-Date) data
-mtd_data = filtered_data[
-    (filtered_data['Date'].dt.month == 1) &  # January data
-    (filtered_data['Date'] <= pd.to_datetime(today))  # Up to today
+start_date, end_date = time_ranges[selected_time]
+filtered_data = filtered_data[
+    (filtered_data['Date'] >= pd.to_datetime(start_date)) &
+    (filtered_data['Date'] <= pd.to_datetime(end_date))
 ]
 
 # Calculate Overall Performance
@@ -93,42 +82,31 @@ def calculate_overall_performance(data):
 
 overall_performance = calculate_overall_performance(filtered_data)
 
-# Display tabs for Today, Weekly, MTD, and Overall Performance
-tabs = ["Overall Performance", "Today"] + [f"Week {i+1}" for i in range(len(weekly_data))] + ["MTD"]
-tab_objects = st.tabs(tabs)
+# Display Overall Performance
+st.markdown("### 📊 Overall Performance")
+st.write(f"**Selected AC Name**: {selected_ac_name}")
+st.write(f"**Selected Time Period**: {selected_time} ({start_date} to {end_date})")
+st.write(f"**Total Entries**: {overall_performance['Total Entries']}")
 
-# Overall Performance tab
-with tab_objects[0]:
-    st.markdown("### 📊 Overall Performance")
-    st.write(f"**Selected AC Name**: {selected_ac_name}")
-    st.write(f"**Total Entries**: {overall_performance['Total Entries']}")
-    if overall_performance['Total Entries'] > 0:
-        st.markdown("#### Sum of Numerical Columns:")
-        st.json(overall_performance["Sum of Values"])
-    else:
+if overall_performance['Total Entries'] > 0:
+    st.markdown("#### Sum of Numerical Columns:")
+    st.json(overall_performance["Sum of Values"])
+else:
+    st.info("No data available for the selected filters.")
+
+# Display Filtered Data in a Tab
+tab1, tab2 = st.tabs(["Filtered Data", "Detailed View"])
+
+with tab1:
+    st.markdown("### Filtered Data")
+    if filtered_data.empty:
         st.info("No data available for the selected filters.")
-
-# Today tab
-with tab_objects[1]:
-    st.markdown(f"### 📅 Today's Data: {today.strftime('%Y-%m-%d')}")
-    if today_data.empty:
-        st.info("No data available for today.")
     else:
-        st.dataframe(today_data, use_container_width=True)
+        st.dataframe(filtered_data, use_container_width=True)
 
-# Weekly tabs
-for i, (week_name, start_date, end_date, week_data) in enumerate(weekly_data):
-    with tab_objects[i + 2]:
-        st.markdown(f"### 📅 {week_name}: {start_date} to {end_date}")
-        if week_data.empty:
-            st.info(f"No data available for {week_name}.")
-        else:
-            st.dataframe(week_data, use_container_width=True)
-
-# MTD tab
-with tab_objects[-1]:
-    st.markdown(f"### 📅 Month-to-Date (MTD) Data: 2025-01-01 to {today.strftime('%Y-%m-%d')}")
-    if mtd_data.empty:
-        st.info("No data available for Month-to-Date.")
+with tab2:
+    st.markdown("### Detailed View")
+    if filtered_data.empty:
+        st.info("No data available for the selected filters.")
     else:
-        st.dataframe(mtd_data, use_container_width=True)
+        st.dataframe(filtered_data.describe(include='all'), use_container_width=True)
