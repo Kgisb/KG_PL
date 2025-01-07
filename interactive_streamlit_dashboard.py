@@ -204,43 +204,29 @@ with dashboard_tab:
                 <p class="metric-title">TD</p>
                 <p class="metric-value">{td:,.0f}</p>
             </div>
-            """,
-            unsafe_allow_html=True,
+            """, unsafe_allow_html=True,
         )
 
     # Add View Filtered Data Option
-with st.expander("🔍 View Filtered Data"):
-    st.markdown("### Filtered Data")
-    if filtered_data.empty:
-        st.info("No data available for the selected filters.")
-    else:
-        # Format numeric columns with commas
-        styled_df = filtered_data.copy()
-        for col in styled_df.select_dtypes(include=['float', 'int']).columns:
-            styled_df[col] = styled_df[col].apply(lambda x: f"{x:,.0f}")
+    with st.expander("🔍 View Filtered Data"):
+        st.markdown("### Filtered Data")
+        if filtered_data.empty:
+            st.info("No data available for the selected filters.")
+        else:
+            # Format numeric columns with commas
+            styled_df = filtered_data.copy()
+            for col in styled_df.select_dtypes(include=['float', 'int']).columns:
+                styled_df[col] = styled_df[col].apply(lambda x: f"{x:,.0f}")
 
-        # Display the formatted dataframe
-        st.dataframe(styled_df, use_container_width=True)
-
+            st.dataframe(styled_df, use_container_width=True)
 
 # Compare Tab
 with compare_tab:
     st.markdown('<div class="section-header">Comparison Metrics</div>', unsafe_allow_html=True)
-
-    # Prepare data for comparison
     compare_data = filtered_data.groupby("AC Name")[["Cash-in", "SGR Conversion"]].sum().reset_index()
-
-    # Add numbering to the first column
-    compare_data.index += 1  # Start numbering from 1
-    compare_data.reset_index(inplace=True)
-    compare_data.rename(columns={"index": "#"}, inplace=True)
-
-    # Format numeric columns
     compare_data["Cash-in"] = compare_data["Cash-in"].apply(lambda x: f"{x:,.0f}")
     compare_data["SGR Conversion"] = compare_data["SGR Conversion"].apply(lambda x: f"{x:,.0f}")
-
-    # Display the table without the index
+    
     st.markdown('<div class="table-container">', unsafe_allow_html=True)
-    st.table(compare_data.style.hide_index())  # Hide the DataFrame index
+    st.table(compare_data)
     st.markdown('</div>', unsafe_allow_html=True)
-
