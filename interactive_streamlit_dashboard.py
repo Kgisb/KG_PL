@@ -50,7 +50,7 @@ st.markdown(
         }
     </style>
     <div class="header-banner">
-        📊 Interactive Dashboard - January Weekly Breakdown and MTD
+        📊 Interactive Dashboard
     </div>
     """,
     unsafe_allow_html=True
@@ -90,43 +90,14 @@ filtered_data = filtered_data[
     (filtered_data['Date'] <= pd.to_datetime(end_date))
 ]
 
-# Define Target and Achievement Columns
-target_columns = {
-    "Cash-in Target": "Cash-in",
-    "Enrl Target": "Enrl",
-    "SGR Conversion Target": "SGR Conversion"
-}
-
-# Generate Metrics for Each Target
-for target_col, achievement_col in target_columns.items():
-    target_value = filtered_data[target_col].sum() if target_col in filtered_data.columns else 0
-    achievement_value = filtered_data[achievement_col].sum() if achievement_col in filtered_data.columns else 0
-    achievement_percentage = (achievement_value / target_value * 100) if target_value > 0 else 0
-
-    st.markdown(
-        f"""
-        <div class="metric-box">
-            <p class="metric-title">{target_col}</p>
-            <p class="metric-value">Target: {target_value}</p>
-            <p class="metric-title">{achievement_col}</p>
-            <p class="metric-value">Achieved: {achievement_value}</p>
-            <p class="metric-title">Achievement (%)</p>
-            <p class="metric-value">{achievement_percentage:.2f}%</p>
-        </div>
-        """,
-        unsafe_allow_html=True,
-    )
-
-# Calculate MLMC% and L2P%
+# Define Metrics
 enrl = filtered_data['Enrl'].sum() if 'Enrl' in filtered_data.columns else 0
 overall_leads = filtered_data['Overall Leads'].sum() if 'Overall Leads' in filtered_data.columns else 0
 sgr_conversion = filtered_data['SGR Conversion'].sum() if 'SGR Conversion' in filtered_data.columns else 0
 sgr_leads = filtered_data['SGR Leads'].sum() if 'SGR Leads' in filtered_data.columns else 0
 
-# MLMC% = (Enrl / Overall Leads) * 100
+# Calculate MLMC% and L2P%
 mlmc = (enrl / overall_leads * 100) if overall_leads > 0 else 0
-
-# L2P% = (Enrl - SGR Conversion) / (Overall Leads - SGR Leads) * 100
 l2p = (
     (enrl - sgr_conversion) / (overall_leads - sgr_leads) * 100
     if (overall_leads - sgr_leads) > 0
@@ -137,23 +108,23 @@ l2p = (
 ts = filtered_data['TS'].sum() if 'TS' in filtered_data.columns else 0
 td = filtered_data['TD'].sum() if 'TD' in filtered_data.columns else 0
 
-# Display Additional Metrics
+# Display Metrics
 st.markdown(
     f"""
     <div class="metric-box">
-        <p class="metric-title">MLMC% (Enrl / Overall Leads)</p>
+        <p class="metric-title">MLMC%</p>
         <p class="metric-value">{int(mlmc)}%</p>
     </div>
     <div class="metric-box">
-        <p class="metric-title">L2P% ((Enrl - SGR Conversion) / (Overall Leads - SGR Leads))</p>
+        <p class="metric-title">L2P%</p>
         <p class="metric-value">{int(l2p)}%</p>
     </div>
     <div class="metric-box">
-        <p class="metric-title">Total TS</p>
+        <p class="metric-title">TS</p>
         <p class="metric-value">{ts}</p>
     </div>
     <div class="metric-box">
-        <p class="metric-title">Total TD</p>
+        <p class="metric-title">TD</p>
         <p class="metric-value">{td}</p>
     </div>
     """,
