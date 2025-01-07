@@ -231,12 +231,20 @@ with compare_tab:
     compare_data["Cash-in"] = compare_data["Cash-in"].apply(lambda x: f"{x:,.0f}")
     compare_data["SGR Conversion"] = compare_data["SGR Conversion"].apply(lambda x: f"{x:,.0f}")
 
+    # Sort by Cash-in by default (descending order)
+    compare_data = compare_data.sort_values(by="Cash-in", ascending=False).reset_index(drop=True)
+
+    # Add numbering column
+    compare_data.index += 1
+    compare_data.reset_index(inplace=True)
+    compare_data.rename(columns={"index": "#"}, inplace=True)
+
     # Add a sort selector
     sort_by = st.selectbox("Sort by", options=["Cash-in", "SGR Conversion"], index=0)
-    compare_data = compare_data.sort_values(by=sort_by, ascending=False)
+    compare_data = compare_data.sort_values(by=sort_by, ascending=False).reset_index(drop=True)
 
     # Display the sorted table
     st.markdown('<div class="table-container">', unsafe_allow_html=True)
-    st.table(compare_data)  # Use st.table to display the sorted DataFrame
+    st.table(compare_data)  # Display the table
     st.markdown('</div>', unsafe_allow_html=True)
 
