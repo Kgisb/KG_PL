@@ -19,7 +19,7 @@ for col in data.columns:
 
 # Streamlit app configuration
 st.set_page_config(
-    page_title="JetLearn Interactive Dashboard",
+    page_title="JetLearn: Interactive B2C Dashboard",
     page_icon="📊",
     layout="wide"
 )
@@ -88,7 +88,7 @@ st.markdown(
  # Dashboard Tab
 with dashboard_tab:
     # Header Banner
-    st.markdown('<div class="header-banner">📊 JetLearn Interactive Dashboard</div>', unsafe_allow_html=True)
+    st.markdown('<div class="header-banner">📊 JetLearn: Interactive B2C Dashboard</div>', unsafe_allow_html=True)
 
     # Sidebar for Filters
     st.sidebar.header("Filter Options")
