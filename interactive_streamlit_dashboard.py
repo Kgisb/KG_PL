@@ -232,10 +232,8 @@ with compare_tab:
         unsafe_allow_html=True,
     )
 
-   # Compare Tab
+  # Compare Tab
 with compare_tab:
-    st.markdown('<h3>Comparison Metrics</h3>', unsafe_allow_html=True)
-
     # Prepare data for comparison
     compare_data = filtered_data.groupby("AC Name")[["Cash-in", "SGR Conversion"]].sum().reset_index()
 
