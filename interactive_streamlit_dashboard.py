@@ -65,7 +65,10 @@ today = datetime.now().date()
 today_data = data[data['Date'] == pd.to_datetime(today)]
 
 # Get MTD (Month-to-Date) data
-mtd_data = data[data['Date'].dt.month == 1]  # Full data for January
+mtd_data = data[
+    (data['Date'].dt.month == 1) &  # January data
+    (data['Date'] <= pd.to_datetime(today))  # Up to today
+]
 
 # Display tabs for Today, Weekly, and MTD
 tabs = ["Today"] + [f"Week {i+1}" for i in range(len(weekly_data))] + ["MTD"]
@@ -90,7 +93,7 @@ for i, (week_name, start_date, end_date, week_data) in enumerate(weekly_data):
 
 # MTD tab
 with tab_objects[-1]:
-    st.markdown("### 📅 Month-to-Date (MTD) Data")
+    st.markdown(f"### 📅 Month-to-Date (MTD) Data: 2025-01-01 to {today.strftime('%Y-%m-%d')}")
     if mtd_data.empty:
         st.info("No data available for Month-to-Date.")
     else:
