@@ -24,23 +24,35 @@ st.set_page_config(
     layout="wide"
 )
 
-# Define Tabs
-tabs = st.tabs(["Dashboard", "Compare"])
-dashboard_tab, compare_tab = tabs
-
 # Global Styling
 st.markdown(
     """
     <style>
+        /* Responsive design for mobile screens */
+        @media (max-width: 768px) {
+            .metric-box {
+                font-size: 12px;
+                padding: 15px;
+            }
+            .metric-title {
+                font-size: 16px;
+            }
+            .metric-value {
+                font-size: 20px;
+            }
+            .section-header {
+                font-size: 18px;
+            }
+        }
         .header-banner {
             background-color: #1E90FF;
             color: white;
-            padding: 15px 20px;
+            padding: 10px 15px;
             border-radius: 8px;
             text-align: center;
-            font-size: 26px;
+            font-size: 24px;
             font-weight: bold;
-            margin-bottom: 20px;
+            margin-bottom: 10px;
         }
         .section-header {
             color: #333333;
@@ -51,7 +63,7 @@ st.markdown(
         }
         .metric-box {
             background-color: #f8f9fa;
-            padding: 20px;
+            padding: 15px;
             border-radius: 8px;
             border: 1px solid #ddd;
             text-align: center;
@@ -69,14 +81,9 @@ st.markdown(
             font-weight: bold;
             color: #007BFF;
         }
-        .divider {
-            height: 2px;
-            background-color: #e0e0e0;
-            margin: 20px 0;
-        }
         .table-container {
             background-color: #ffffff;
-            padding: 15px;
+            padding: 10px;
             border-radius: 8px;
             box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
         }
@@ -84,6 +91,10 @@ st.markdown(
     """,
     unsafe_allow_html=True
 )
+
+# Tabs for navigation
+tabs = st.tabs(["Dashboard", "Compare"])
+dashboard_tab, compare_tab = tabs
 
 # Dashboard Tab
 with dashboard_tab:
@@ -111,7 +122,7 @@ with dashboard_tab:
 
     start_date, end_date = time_ranges[selected_time]
     filtered_data = data[
-        (data['Date'] >= pd.to_datetime(start_date)) &
+        (data['Date'] >= pd.to_datetime(start_date)) & 
         (data['Date'] <= pd.to_datetime(end_date))
     ]
 
@@ -119,106 +130,49 @@ with dashboard_tab:
     if selected_ac_name != "ALL":
         filtered_data = filtered_data[filtered_data['AC Name'] == selected_ac_name]
 
-    # Calculate metrics
+    # Metrics
     enrl = filtered_data['Enrl'].sum() if 'Enrl' in filtered_data.columns else 0
-    overall_leads = filtered_data['Overall Leads'].sum() if 'Overall Leads' in filtered_data.columns else 0
+    cash_in = filtered_data['Cash-in'].sum() if 'Cash-in' in filtered_data.columns else 0
     sgr_conversion = filtered_data['SGR Conversion'].sum() if 'SGR Conversion' in filtered_data.columns else 0
-    sgr_leads = filtered_data['SGR Leads'].sum() if 'SGR Leads' in filtered_data.columns else 0
 
-    # MLMC% and L2P%
-    mlmc = (enrl / overall_leads * 100) if overall_leads > 0 else 0
-    l2p = (
-        (enrl - sgr_conversion) / (overall_leads - sgr_leads) * 100
-        if (overall_leads - sgr_leads) > 0
-        else 0
-    )
-
-    # TS, TD, Lead-to-TD, and TD-to-Enrl
-    ts = filtered_data['TS'].sum() if 'TS' in filtered_data.columns else 0
-    td = filtered_data['TD'].sum() if 'TD' in filtered_data.columns else 0
-    lead_to_td = (td / overall_leads * 100) if overall_leads > 0 else 0
-    td_to_enrl = (enrl / td * 100) if td > 0 else 0
-
-    # Display Target vs. Achievement
+    # Display Target vs Achievement Metrics
     st.markdown('<div class="section-header">Target vs. Achievement</div>', unsafe_allow_html=True)
-    target_columns = {
-        "Cash-in Target": "Cash-in",
-        "Enrl Target": "Enrl",
-        "SGR Conversion Target": "SGR Conversion"
-    }
-
     col1, col2 = st.columns(2)
-    for idx, (target_col, achievement_col) in enumerate(target_columns.items()):
-        target_value = filtered_data[target_col].sum() if target_col in filtered_data.columns else 0
-        achievement_value = filtered_data[achievement_col].sum() if achievement_col in filtered_data.columns else 0
-        achievement_percentage = (achievement_value / target_value * 100) if target_value > 0 else 0
+    with col1:
+        st.markdown(
+            f"""
+            <div class="metric-box">
+                <p class="metric-title">Total Enrollments</p>
+                <p class="metric-value">{enrl:,.0f}</p>
+            </div>
+            """,
+            unsafe_allow_html=True,
+        )
+    with col2:
+        st.markdown(
+            f"""
+            <div class="metric-box">
+                <p class="metric-title">Total SGR Conversion</p>
+                <p class="metric-value">{sgr_conversion:,.0f}</p>
+            </div>
+            """,
+            unsafe_allow_html=True,
+        )
 
-        with col1 if idx % 2 == 0 else col2:
-            st.markdown(
-                f"""
-                <div class="metric-box">
-                    <p class="metric-title">{target_col.split(' Target')[0]}</p>
-                    <p class="metric-value">{achievement_value:,.0f} / {target_value:,.0f}</p>
-                    <p class="metric-title">Achievement</p>
-                    <p class="metric-value">{achievement_percentage:.0f}%</p>
-                </div>
-                """,
-                unsafe_allow_html=True,
-            )
-
-    # Display Key Metrics
+    # Display Key Performance Metrics
     st.markdown('<div class="divider"></div>', unsafe_allow_html=True)
     st.markdown('<div class="section-header">Key Performance Metrics</div>', unsafe_allow_html=True)
-
     col3, col4 = st.columns(2)
     with col3:
         st.markdown(
             f"""
             <div class="metric-box">
-                <p class="metric-title">MLMC%</p>
-                <p class="metric-value">{int(mlmc)}%</p>
-            </div>
-            <div class="metric-box">
-                <p class="metric-title">Lead-to-TD</p>
-                <p class="metric-value">{int(lead_to_td)}%</p>
-            </div>
-            <div class="metric-box">
-                <p class="metric-title">TS</p>
-                <p class="metric-value">{ts:,.0f}</p>
+                <p class="metric-title">Total Cash-in</p>
+                <p class="metric-value">{cash_in:,.0f}</p>
             </div>
             """,
             unsafe_allow_html=True,
         )
-    with col4:
-        st.markdown(
-            f"""
-            <div class="metric-box">
-                <p class="metric-title">L2P%</p>
-                <p class="metric-value">{int(l2p)}%</p>
-            </div>
-            <div class="metric-box">
-                <p class="metric-title">TD-to-Enrl</p>
-                <p class="metric-value">{int(td_to_enrl)}%</p>
-            </div>
-            <div class="metric-box">
-                <p class="metric-title">TD</p>
-                <p class="metric-value">{td:,.0f}</p>
-            </div>
-            """, unsafe_allow_html=True,
-        )
-
-    # Add View Filtered Data Option
-    with st.expander("🔍 View Filtered Data"):
-        st.markdown("### Filtered Data")
-        if filtered_data.empty:
-            st.info("No data available for the selected filters.")
-        else:
-            # Format numeric columns with commas
-            styled_df = filtered_data.copy()
-            for col in styled_df.select_dtypes(include=['float', 'int']).columns:
-                styled_df[col] = styled_df[col].apply(lambda x: f"{x:,.0f}")
-
-            st.dataframe(styled_df, use_container_width=True)
 
 # Compare Tab
 with compare_tab:
@@ -226,20 +180,9 @@ with compare_tab:
 
     # Prepare data for comparison
     compare_data = filtered_data.groupby("AC Name")[["Cash-in", "SGR Conversion"]].sum().reset_index()
-
-    # Format numeric columns
-    compare_data["Cash-in"] = compare_data["Cash-in"].apply(lambda x: f"{x:,.0f}")
-    compare_data["SGR Conversion"] = compare_data["SGR Conversion"].apply(lambda x: f"{x:,.0f}")
-
-    # Sort by Cash-in by default (descending order)
     compare_data = compare_data.sort_values(by="Cash-in", ascending=False).reset_index(drop=True)
 
-    # Add a sort selector
-    sort_by = st.selectbox("Sort by", options=["Cash-in", "SGR Conversion"], index=0)
-    compare_data = compare_data.sort_values(by=sort_by, ascending=False).reset_index(drop=True)
-
-    # Display the sorted table without indexing
+    # Table with scrollable view for mobile
     st.markdown('<div class="table-container">', unsafe_allow_html=True)
-    st.table(compare_data)  # Display the cleaned table without default indexing
+    st.dataframe(compare_data, use_container_width=True)  # Enables horizontal scrolling for mobile
     st.markdown('</div>', unsafe_allow_html=True)
-
