@@ -27,6 +27,19 @@ st.markdown(
             border-radius: 8px;
             text-align: center;
             font-size: 24px;
+            font-weight: bold;
+        }
+        .performance-box {
+            background-color: #f9f9f9;
+            padding: 15px;
+            border-radius: 8px;
+            border: 1px solid #ddd;
+            box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.1);
+        }
+        .summary-title {
+            font-size: 18px;
+            font-weight: bold;
+            color: #333;
         }
     </style>
     <div class="header-banner">
@@ -86,26 +99,34 @@ overall_performance = calculate_overall_performance(filtered_data)
 st.markdown("### 📊 Overall Performance")
 st.write(f"**Selected AC Name**: {selected_ac_name}")
 st.write(f"**Selected Time Period**: {selected_time} ({start_date} to {end_date})")
-st.write(f"**Total Entries**: {overall_performance['Total Entries']}")
 
+# Stylish box for summary
+st.markdown(
+    f"""
+    <div class="performance-box">
+        <p class="summary-title">Total Entries: {overall_performance['Total Entries']}</p>
+        <p class="summary-title">Sum of Numerical Columns:</p>
+        <ul>
+    """,
+    unsafe_allow_html=True,
+)
 if overall_performance['Total Entries'] > 0:
-    st.markdown("#### Sum of Numerical Columns:")
-    st.json(overall_performance["Sum of Values"])
+    for col, val in overall_performance['Sum of Values'].items():
+        st.markdown(f"- **{col}:** {val}")
 else:
     st.info("No data available for the selected filters.")
 
-# Display Filtered Data in a Tab
-tab1, tab2 = st.tabs(["Filtered Data", "Detailed View"])
-
-with tab1:
+# Detailed data with expander
+with st.expander("🔍 View Filtered Data"):
     st.markdown("### Filtered Data")
     if filtered_data.empty:
         st.info("No data available for the selected filters.")
     else:
         st.dataframe(filtered_data, use_container_width=True)
 
-with tab2:
-    st.markdown("### Detailed View")
+# Detailed stats with expander
+with st.expander("📊 View Detailed Summary Statistics"):
+    st.markdown("### Detailed Summary Statistics")
     if filtered_data.empty:
         st.info("No data available for the selected filters.")
     else:
