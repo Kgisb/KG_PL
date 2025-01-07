@@ -90,63 +90,32 @@ filtered_data = filtered_data[
     (filtered_data['Date'] <= pd.to_datetime(end_date))
 ]
 
-# Define Target and Achievements
-cash_in_target = 100000  # Example target
-cash_in_achievement = filtered_data['Cash-in'].sum() if 'Cash-in' in filtered_data.columns else 0
+# Define Target and Achievement Columns
+target_columns = {
+    "Cash-in Target": "Cash-in",
+    "Enrollment Target": "Enrollment",
+    "SGR Conversion Target": "SGR Conversion"
+}
 
-enrollment_target = 50  # Example target
-enrollment_achievement = filtered_data['Enrollment'].sum() if 'Enrollment' in filtered_data.columns else 0
+# Generate Metrics for Each Target
+for target_col, achievement_col in target_columns.items():
+    target_value = filtered_data[target_col].sum() if target_col in filtered_data.columns else 0
+    achievement_value = filtered_data[achievement_col].sum() if achievement_col in filtered_data.columns else 0
+    achievement_percentage = (achievement_value / target_value * 100) if target_value > 0 else 0
 
-sgr_target = 4  # Example target
-sgr_achievement = filtered_data['SGR Conversion'].sum() if 'SGR Conversion' in filtered_data.columns else 0
-
-# Overall Performance Display
-st.markdown("### 📊 Overall Performance")
-
-# Cash-in Performance
-st.markdown(
-    f"""
-    <div class="metric-box">
-        <p class="metric-title">Cash-in Target</p>
-        <p class="metric-value">{cash_in_target}</p>
-        <p class="metric-title">Cash-in Achievement</p>
-        <p class="metric-value">{cash_in_achievement}</p>
-        <p class="metric-title">Achievement (%)</p>
-        <p class="metric-value">{(cash_in_achievement / cash_in_target) * 100 if cash_in_target > 0 else 0:.2f}%</p>
-    </div>
-    """,
-    unsafe_allow_html=True,
-)
-
-# Enrollment Performance
-st.markdown(
-    f"""
-    <div class="metric-box">
-        <p class="metric-title">Enrollment Target</p>
-        <p class="metric-value">{enrollment_target}</p>
-        <p class="metric-title">Enrollment Achievement</p>
-        <p class="metric-value">{enrollment_achievement}</p>
-        <p class="metric-title">Achievement (%)</p>
-        <p class="metric-value">{(enrollment_achievement / enrollment_target) * 100 if enrollment_target > 0 else 0:.2f}%</p>
-    </div>
-    """,
-    unsafe_allow_html=True,
-)
-
-# SGR Conversion Performance
-st.markdown(
-    f"""
-    <div class="metric-box">
-        <p class="metric-title">SGR Conversion Target</p>
-        <p class="metric-value">{sgr_target}</p>
-        <p class="metric-title">SGR Conversion Achievement</p>
-        <p class="metric-value">{sgr_achievement}</p>
-        <p class="metric-title">Achievement (%)</p>
-        <p class="metric-value">{(sgr_achievement / sgr_target) * 100 if sgr_target > 0 else 0:.2f}%</p>
-    </div>
-    """,
-    unsafe_allow_html=True,
-)
+    st.markdown(
+        f"""
+        <div class="metric-box">
+            <p class="metric-title">{target_col}</p>
+            <p class="metric-value">Target: {target_value}</p>
+            <p class="metric-title">{achievement_col}</p>
+            <p class="metric-value">Achieved: {achievement_value}</p>
+            <p class="metric-title">Achievement (%)</p>
+            <p class="metric-value">{achievement_percentage:.2f}%</p>
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
 
 # Filtered Data with Expander
 with st.expander("🔍 View Filtered Data"):
