@@ -19,7 +19,7 @@ for col in data.columns:
 
 # Streamlit app configuration
 st.set_page_config(
-    page_title="Interactive Dashboard",
+    page_title="JetLearn Interactive Dashboard",
     page_icon="📊",
     layout="wide"
 )
