@@ -19,10 +19,10 @@ st.set_page_config(
 # Title and description
 st.title("📊 Interactive Dashboard with Weekly Tabs")
 st.markdown(
-    """
-    Explore the data with Month-to-Date (MTD) and weekly breakdowns.
+    '''
+    Explore the data with today's data, weekly breakdowns, and Month-to-Date (MTD).
     Use filters to refine results and download the filtered data.
-    """
+    '''
 )
 
 # Sidebar filters
@@ -77,19 +77,28 @@ def split_into_weeks(data):
 
 mtd_data, weekly_data = split_into_weeks(filtered_data)
 
-# Display tabs for MTD and weekly data
-tab1, tab2, tab3, tab4, tab5, tab6 = st.tabs(["MTD", "Week 1", "Week 2", "Week 3", "Week 4", "Week 5"])
+# Filter data for today's date
+today = datetime.now().date()
+today_data = filtered_data[filtered_data['Date'] == pd.to_datetime(today)]
 
-# MTD tab
+# Display tabs for Today, weekly data, and MTD
+tab1, tab2, tab3, tab4, tab5, tab6, tab7 = st.tabs(["Today", "Week 1", "Week 2", "Week 3", "Week 4", "Week 5", "MTD"])
+
+# Today tab
 with tab1:
-    st.subheader("Month-to-Date (MTD) Data")
-    st.dataframe(mtd_data, use_container_width=True)
+    st.subheader(f"Today's Data: {today.strftime('%Y-%m-%d')}")
+    st.dataframe(today_data, use_container_width=True)
 
 # Weekly tabs
 for i, (start, end, week_data) in enumerate(weekly_data):
     with [tab2, tab3, tab4, tab5, tab6][i]:
         st.subheader(f"Week {i + 1}: {start.strftime('%Y-%m-%d')} to {end.strftime('%Y-%m-%d')}")
         st.dataframe(week_data, use_container_width=True)
+
+# MTD tab
+with tab7:
+    st.subheader("Month-to-Date (MTD) Data")
+    st.dataframe(mtd_data, use_container_width=True)
 
 # Download filtered data
 st.sidebar.markdown("### Download Filtered Data")
