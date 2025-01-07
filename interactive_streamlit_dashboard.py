@@ -220,18 +220,6 @@ with dashboard_tab:
 
             st.dataframe(styled_df, use_container_width=True)
 
-with compare_tab:
-    # Styled Section Header
-    st.markdown(
-        """
-        <div class="section-header">
-            <h3 style="margin-bottom: 0; color: #1E90FF;">🔍 Comparison Metrics</h3>
-            <p style="font-size: 14px; color: #555;">Analyze performance metrics by AC Name.</p>
-        </div>
-        """,
-        unsafe_allow_html=True,
-    )
-
 # Compare Tab
 with compare_tab:
     # Prepare data for comparison
@@ -246,5 +234,6 @@ with compare_tab:
 
     # Display table with built-in sorting (click column headers)
     st.dataframe(compare_data, use_container_width=True)
+
 
 
