@@ -101,14 +101,11 @@ filtered_data = filtered_data[
     (filtered_data['Date'] <= pd.to_datetime(end_date))
 ]
 
-# Identify numeric columns for formatting
-numeric_columns = filtered_data.select_dtypes(include=['number']).columns
-
 # Calculate metrics
-enrl = filtered_data['Enrl'].sum() if 'Enrl' in numeric_columns else 0
-overall_leads = filtered_data['Overall Leads'].sum() if 'Overall Leads' in numeric_columns else 0
-sgr_conversion = filtered_data['SGR Conversion'].sum() if 'SGR Conversion' in numeric_columns else 0
-sgr_leads = filtered_data['SGR Leads'].sum() if 'SGR Leads' in numeric_columns else 0
+enrl = filtered_data['Enrl'].sum() if 'Enrl' in filtered_data.columns else 0
+overall_leads = filtered_data['Overall Leads'].sum() if 'Overall Leads' in filtered_data.columns else 0
+sgr_conversion = filtered_data['SGR Conversion'].sum() if 'SGR Conversion' in filtered_data.columns else 0
+sgr_leads = filtered_data['SGR Leads'].sum() if 'SGR Leads' in filtered_data.columns else 0
 
 # MLMC% and L2P%
 mlmc = (enrl / overall_leads * 100) if overall_leads > 0 else 0
@@ -119,8 +116,8 @@ l2p = (
 )
 
 # TS and TD
-ts = filtered_data['TS'].sum() if 'TS' in numeric_columns else 0
-td = filtered_data['TD'].sum() if 'TD' in numeric_columns else 0
+ts = filtered_data['TS'].sum() if 'TS' in filtered_data.columns else 0
+td = filtered_data['TD'].sum() if 'TD' in filtered_data.columns else 0
 
 # Display Target vs. Achievement
 st.markdown('<div class="section-header">Target vs. Achievement</div>', unsafe_allow_html=True)
@@ -132,8 +129,8 @@ target_columns = {
 
 col1, col2 = st.columns(2)
 for idx, (target_col, achievement_col) in enumerate(target_columns.items()):
-    target_value = filtered_data[target_col].sum() if target_col in numeric_columns else 0
-    achievement_value = filtered_data[achievement_col].sum() if achievement_col in numeric_columns else 0
+    target_value = filtered_data[target_col].sum() if target_col in filtered_data.columns else 0
+    achievement_value = filtered_data[achievement_col].sum() if achievement_col in filtered_data.columns else 0
     achievement_percentage = (achievement_value / target_value * 100) if target_value > 0 else 0
 
     with col1 if idx % 2 == 0 else col2:
@@ -141,7 +138,7 @@ for idx, (target_col, achievement_col) in enumerate(target_columns.items()):
             f"""
             <div class="metric-box">
                 <p class="metric-title">{target_col.split(' Target')[0]}</p>
-                <p class="metric-value">{achievement_value:,.0f} / {target_value:,.0f}</p>
+                <p class="metric-value">{achievement_value} / {target_value}</p>
                 <p class="metric-title">Achievement</p>
                 <p class="metric-value">{achievement_percentage:.0f}%</p>
             </div>
@@ -163,7 +160,7 @@ with col3:
         </div>
         <div class="metric-box">
             <p class="metric-title">TS</p>
-            <p class="metric-value">{ts:,.0f}</p>
+            <p class="metric-value">{ts}</p>
         </div>
         """,
         unsafe_allow_html=True,
@@ -177,7 +174,7 @@ with col4:
         </div>
         <div class="metric-box">
             <p class="metric-title">TD</p>
-            <p class="metric-value">{td:,.0f}</p>
+            <p class="metric-value">{td}</p>
         </div>
         """,
         unsafe_allow_html=True,
@@ -189,5 +186,4 @@ with st.expander("🔍 View Filtered Data"):
     if filtered_data.empty:
         st.info("No data available for the selected filters.")
     else:
-        styled_df = filtered_data.style.format({col: "{:,.0f}" for col in numeric_columns})
-        st.dataframe(styled_df, use_container_width=True)
+        st.dataframe(filtered_data, use_container_width=True)
