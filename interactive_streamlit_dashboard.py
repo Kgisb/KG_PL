@@ -182,6 +182,10 @@ with dashboard_tab:
                 <p class="metric-title">Lead-to-TD</p>
                 <p class="metric-value">{int(lead_to_td)}%</p>
             </div>
+            <div class="metric-box">
+                <p class="metric-title">TS</p>
+                <p class="metric-value">{ts:,.0f}</p>
+            </div>
             """,
             unsafe_allow_html=True,
         )
@@ -196,6 +200,10 @@ with dashboard_tab:
                 <p class="metric-title">TD-to-Enrl</p>
                 <p class="metric-value">{int(td_to_enrl)}%</p>
             </div>
+            <div class="metric-box">
+                <p class="metric-title">TD</p>
+                <p class="metric-value">{td:,.0f}</p>
+            </div>
             """,
             unsafe_allow_html=True,
         )
@@ -209,3 +217,4 @@ with compare_tab:
     st.markdown('<div class="table-container">', unsafe_allow_html=True)
     st.table(compare_data)
     st.markdown('</div>', unsafe_allow_html=True)
+
