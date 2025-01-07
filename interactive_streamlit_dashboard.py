@@ -93,7 +93,7 @@ filtered_data = filtered_data[
 # Define Target and Achievement Columns
 target_columns = {
     "Cash-in Target": "Cash-in",
-    "Enrollment Target": "Enrollment",
+    "Enrl Target": "Enrl",
     "SGR Conversion Target": "SGR Conversion"
 }
 
