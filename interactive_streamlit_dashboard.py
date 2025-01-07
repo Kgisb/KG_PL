@@ -124,7 +124,6 @@ with dashboard_tab:
     overall_leads = filtered_data['Overall Leads'].sum() if 'Overall Leads' in filtered_data.columns else 0
     sgr_conversion = filtered_data['SGR Conversion'].sum() if 'SGR Conversion' in filtered_data.columns else 0
     sgr_leads = filtered_data['SGR Leads'].sum() if 'SGR Leads' in filtered_data.columns else 0
-    cash_in = filtered_data['Cash-in'].sum() if 'Cash-in' in filtered_data.columns else 0
 
     # MLMC% and L2P%
     mlmc = (enrl / overall_leads * 100) if overall_leads > 0 else 0
@@ -134,36 +133,11 @@ with dashboard_tab:
         else 0
     )
 
-    # TS and TD
+    # TS, TD, Lead-to-TD, and TD-to-Enrl
     ts = filtered_data['TS'].sum() if 'TS' in filtered_data.columns else 0
     td = filtered_data['TD'].sum() if 'TD' in filtered_data.columns else 0
-
-    # Display Target vs. Achievement
-    st.markdown('<div class="section-header">Target vs. Achievement</div>', unsafe_allow_html=True)
-    target_columns = {
-        "Cash-in Target": "Cash-in",
-        "Enrl Target": "Enrl",
-        "SGR Conversion Target": "SGR Conversion"
-    }
-
-    col1, col2 = st.columns(2)
-    for idx, (target_col, achievement_col) in enumerate(target_columns.items()):
-        target_value = filtered_data[target_col].sum() if target_col in filtered_data.columns else 0
-        achievement_value = filtered_data[achievement_col].sum() if achievement_col in filtered_data.columns else 0
-        achievement_percentage = (achievement_value / target_value * 100) if target_value > 0 else 0
-
-        with col1 if idx % 2 == 0 else col2:
-            st.markdown(
-                f"""
-                <div class="metric-box">
-                    <p class="metric-title">{target_col.split(' Target')[0]}</p>
-                    <p class="metric-value">{achievement_value:,.0f} / {target_value:,.0f}</p>
-                    <p class="metric-title">Achievement</p>
-                    <p class="metric-value">{achievement_percentage:.0f}%</p>
-                </div>
-                """,
-                unsafe_allow_html=True,
-            )
+    lead_to_td = (td / overall_leads * 100) if overall_leads > 0 else 0
+    td_to_enrl = (enrl / td * 100) if td > 0 else 0
 
     # Display Key Metrics
     st.markdown('<div class="divider"></div>', unsafe_allow_html=True)
@@ -174,12 +148,12 @@ with dashboard_tab:
         st.markdown(
             f"""
             <div class="metric-box">
-                <p class="metric-title">Cash-in</p>
-                <p class="metric-value">{cash_in:,.0f}</p>
-            </div>
-            <div class="metric-box">
                 <p class="metric-title">MLMC%</p>
                 <p class="metric-value">{int(mlmc)}%</p>
+            </div>
+            <div class="metric-box">
+                <p class="metric-title">Lead-to-TD</p>
+                <p class="metric-value">{int(lead_to_td)}%</p>
             </div>
             """,
             unsafe_allow_html=True,
@@ -192,12 +166,8 @@ with dashboard_tab:
                 <p class="metric-value">{int(l2p)}%</p>
             </div>
             <div class="metric-box">
-                <p class="metric-title">TS</p>
-                <p class="metric-value">{ts:,.0f}</p>
-            </div>
-            <div class="metric-box">
-                <p class="metric-title">TD</p>
-                <p class="metric-value">{td:,.0f}</p>
+                <p class="metric-title">TD-to-Enrl</p>
+                <p class="metric-value">{int(td_to_enrl)}%</p>
             </div>
             """,
             unsafe_allow_html=True,
@@ -212,4 +182,3 @@ with compare_tab:
     st.markdown('<div class="table-container">', unsafe_allow_html=True)
     st.table(compare_data)
     st.markdown('</div>', unsafe_allow_html=True)
-   
