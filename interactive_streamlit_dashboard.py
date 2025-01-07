@@ -209,17 +209,19 @@ with dashboard_tab:
         )
 
     # Add View Filtered Data Option
-    with st.expander("🔍 View Filtered Data"):
-        st.markdown"### Filtered Data")
-        if filtered_data.empty:
-            st.info("No data available for the selected filters.")
-        else:
-            # Format numeric columns with commas
-            styled_df = filtered_data.copy()
-            for col in styled_df.select_dtypes(include=['float', 'int']).columns:
-                styled_df[col] = styled_df[col].apply(lambda x: f"{x:,.0f}")
+with st.expander("🔍 View Filtered Data"):
+    st.markdown("### Filtered Data")
+    if filtered_data.empty:
+        st.info("No data available for the selected filters.")
+    else:
+        # Format numeric columns with commas
+        styled_df = filtered_data.copy()
+        for col in styled_df.select_dtypes(include=['float', 'int']).columns:
+            styled_df[col] = styled_df[col].apply(lambda x: f"{x:,.0f}")
 
-            st.dataframe(styled_df, use_container_width=True)
+        # Display the formatted dataframe
+        st.dataframe(styled_df, use_container_width=True)
+
 
 # Compare Tab
 with compare_tab:
