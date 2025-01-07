@@ -220,9 +220,17 @@ with dashboard_tab:
 
             st.dataframe(styled_df, use_container_width=True)
 
-# Compare Tab
 with compare_tab:
-    st.markdown('<div class="section-header">Comparison Metrics</div>', unsafe_allow_html=True)
+    # Styled Section Header
+    st.markdown(
+        """
+        <div class="section-header">
+            <h3 style="margin-bottom: 0; color: #1E90FF;">🔍 Comparison Metrics</h3>
+            <p style="font-size: 14px; color: #555;">Analyze performance metrics by AC Name.</p>
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
 
     # Prepare data for comparison
     compare_data = filtered_data.groupby("AC Name")[["Cash-in", "SGR Conversion"]].sum().reset_index()
@@ -234,11 +242,31 @@ with compare_tab:
     # Sort by Cash-in by default (descending order)
     compare_data = compare_data.sort_values(by="Cash-in", ascending=False).reset_index(drop=True)
 
-    # Add a sort selector
-    sort_by = st.selectbox("Sort by", options=["Cash-in", "SGR Conversion"], index=0)
+    # Add a sort selector with styling
+    st.markdown('<p style="font-size: 14px; font-weight: bold; margin-bottom: 5px;">Sort by:</p>', unsafe_allow_html=True)
+    sort_by = st.selectbox(
+        "",  # No label for cleaner layout
+        options=["Cash-in", "SGR Conversion"],
+        index=0,
+        key="compare_sort_selector"
+    )
     compare_data = compare_data.sort_values(by=sort_by, ascending=False).reset_index(drop=True)
 
-    # Display the sorted table without indexing
-    st.markdown('<div class="table-container">', unsafe_allow_html=True)
-    st.table(compare_data)  # Display the cleaned table without default indexing
+    # Responsive Table Design
+    st.markdown('<div class="table-container" style="overflow-x: auto;">', unsafe_allow_html=True)
+    st.dataframe(
+        compare_data.style.set_table_styles(
+            [
+                {
+                    "selector": "th",
+                    "props": [("background-color", "#1E90FF"), ("color", "white"), ("font-weight", "bold"), ("text-align", "center")],
+                },
+                {
+                    "selector": "td",
+                    "props": [("text-align", "center"), ("padding", "10px")],
+                },
+            ]
+        ),
+        use_container_width=True,
+    )
     st.markdown('</div>', unsafe_allow_html=True)
