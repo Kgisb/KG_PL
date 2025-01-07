@@ -171,10 +171,6 @@ with col3:
             <p class="metric-value">{int(mlmc)}%</p>
         </div>
         <div class="metric-box">
-            <p class="metric-title">TS</p>
-            <p class="metric-value">{ts:,.0f}</p>
-        </div>
-        <div class="metric-box">
             <p class="metric-title">Lead-to-TD</p>
             <p class="metric-value">{lead_to_td}%</p>
         </div>
@@ -189,12 +185,34 @@ with col4:
             <p class="metric-value">{int(l2p)}%</p>
         </div>
         <div class="metric-box">
-            <p class="metric-title">TD</p>
-            <p class="metric-value">{td:,.0f}</p>
-        </div>
-        <div class="metric-box">
             <p class="metric-title">TD-to-Enrl</p>
             <p class="metric-value">{td_to_enrl}%</p>
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
+
+# Display TS and TD at the end
+st.markdown('<div class="divider"></div>', unsafe_allow_html=True)
+st.markdown('<div class="section-header">Additional Metrics</div>', unsafe_allow_html=True)
+
+col5, col6 = st.columns(2)
+with col5:
+    st.markdown(
+        f"""
+        <div class="metric-box">
+            <p class="metric-title">TS</p>
+            <p class="metric-value">{ts:,.0f}</p>
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
+with col6:
+    st.markdown(
+        f"""
+        <div class="metric-box">
+            <p class="metric-title">TD</p>
+            <p class="metric-value">{td:,.0f}</p>
         </div>
         """,
         unsafe_allow_html=True,
@@ -208,8 +226,4 @@ with st.expander("🔍 View Filtered Data"):
     else:
         # Apply formatting dynamically to numeric columns
         styled_df = filtered_data.copy()
-        for col in styled_df.select_dtypes(include=['float', 'int']).columns:
-            styled_df[col] = styled_df[col].apply(lambda x: f"{x:,.0f}")
-        
-        # Display the dataframe with comma formatting
-        st.dataframe(styled_df, use_container_width=True)
+        for col
