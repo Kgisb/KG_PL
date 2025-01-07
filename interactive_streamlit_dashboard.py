@@ -108,7 +108,33 @@ l2p = (
 ts = filtered_data['TS'].sum() if 'TS' in filtered_data.columns else 0
 td = filtered_data['TD'].sum() if 'TD' in filtered_data.columns else 0
 
-# Display Metrics
+# Display Target vs. Achievement Metrics
+st.markdown("### Target vs. Achievement")
+target_columns = {
+    "Cash-in Target": "Cash-in",
+    "Enrl Target": "Enrl",
+    "SGR Conversion Target": "SGR Conversion"
+}
+
+for target_col, achievement_col in target_columns.items():
+    target_value = filtered_data[target_col].sum() if target_col in filtered_data.columns else 0
+    achievement_value = filtered_data[achievement_col].sum() if achievement_col in filtered_data.columns else 0
+    achievement_percentage = (achievement_value / target_value * 100) if target_value > 0 else 0
+
+    st.markdown(
+        f"""
+        <div class="metric-box">
+            <p class="metric-title">{target_col.split(' Target')[0]}</p>
+            <p class="metric-value">Target: {target_value}</p>
+            <p class="metric-value">Achieved: {achievement_value}</p>
+            <p class="metric-value">Achievement: {achievement_percentage:.0f}%</p>
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
+
+# Display MLMC%, L2P%, TS, and TD
+st.markdown("### Key Performance Metrics")
 st.markdown(
     f"""
     <div class="metric-box">
