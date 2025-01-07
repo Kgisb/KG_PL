@@ -220,10 +220,4 @@ with col6:
 
 # Filtered Data in Expander
 with st.expander("🔍 View Filtered Data"):
-    st.markdown("### Filtered Data")
-    if filtered_data.empty:
-        st.info("No data available for the selected filters.")
-    else:
-        # Apply formatting dynamically to numeric columns
-        styled_df = filtered_data.copy()
-        for col
+    st.markdown("###
