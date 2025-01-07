@@ -9,13 +9,13 @@ data = pd.read_csv(sheet_url)
 # Ensure the Date column is in datetime format
 data['Date'] = pd.to_datetime(data['Date'])
 
-# Clean numeric columns (remove commas and convert to integers)
-numeric_columns = data.select_dtypes(include=['object']).columns
-for col in numeric_columns:
-    try:
-        data[col] = data[col].str.replace(',', '').astype(float)
-    except ValueError:
-        pass
+# Clean numeric columns (remove commas and convert to numeric types)
+for col in data.columns:
+    if data[col].dtype == 'object':  # Check for non-numeric columns
+        try:
+            data[col] = data[col].str.replace(',', '').astype(float)
+        except ValueError:
+            continue  # Skip columns that cannot be converted
 
 # Streamlit app configuration
 st.set_page_config(
@@ -154,10 +154,45 @@ for idx, (target_col, achievement_col) in enumerate(target_columns.items()):
             unsafe_allow_html=True,
         )
 
-# Filtered Data with Expander
+# Display Key Metrics
+st.markdown('<div class="divider"></div>', unsafe_allow_html=True)
+st.markdown('<div class="section-header">Key Performance Metrics</div>', unsafe_allow_html=True)
+
+col3, col4 = st.columns(2)
+with col3:
+    st.markdown(
+        f"""
+        <div class="metric-box">
+            <p class="metric-title">MLMC%</p>
+            <p class="metric-value">{int(mlmc)}%</p>
+        </div>
+        <div class="metric-box">
+            <p class="metric-title">TS</p>
+            <p class="metric-value">{ts:,.0f}</p>
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
+with col4:
+    st.markdown(
+        f"""
+        <div class="metric-box">
+            <p class="metric-title">L2P%</p>
+            <p class="metric-value">{int(l2p)}%</p>
+        </div>
+        <div class="metric-box">
+            <p class="metric-title">TD</p>
+            <p class="metric-value">{td:,.0f}</p>
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
+
+# Filtered Data in Expander
 with st.expander("🔍 View Filtered Data"):
     st.markdown("### Filtered Data")
     if filtered_data.empty:
         st.info("No data available for the selected filters.")
     else:
-        st.dataframe(filtered_data.style.format("{:,.0f}"), use_container_width=True)
+        styled_df = filtered_data.style.format("{:,.0f}")
+        st.dataframe(styled_df, use_container_width=True)
