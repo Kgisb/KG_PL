@@ -106,7 +106,7 @@ with dashboard_tab:
         "WK 3": ("2025-01-14", "2025-01-20"),
         "WK 4": ("2025-01-21", "2025-01-27"),
         "WK 5": ("2025-01-28", "2025-01-31"),
-        "MTD": ("2025-01-01", datetime.now().date()),
+        "MTD": ("2025-01-01", "2025-01-31"),
     }
 
     start_date, end_date = time_ranges[selected_time]
