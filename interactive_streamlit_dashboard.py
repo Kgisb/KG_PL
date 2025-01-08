@@ -149,6 +149,38 @@ td_to_enrl = (enrl / td * 100) if td > 0 else 0
 
 # Display Key Metrics and Tables in Dashboard
 with dashboard_tab:
+    st.markdown('<div class="header-banner">📊 JetLearn: Interactive B2C Dashboard</div>', unsafe_allow_html=True)
+
+    # Target vs Achievement
+    st.markdown('<div class="divider"></div>', unsafe_allow_html=True)
+    st.markdown('<div class="section-header">Target vs. Achievement</div>', unsafe_allow_html=True)
+
+    target_columns = {
+        "Cash-in Target": "Cash-in",
+        "Enrl Target": "Enrl",
+        "SGR Conversion Target": "SGR Conversion"
+    }
+
+    col1, col2 = st.columns(2)
+    for idx, (target_col, achievement_col) in enumerate(target_columns.items()):
+        target_value = filtered_data[target_col].sum() if target_col in filtered_data.columns else 0
+        achievement_value = filtered_data[achievement_col].sum() if achievement_col in filtered_data.columns else 0
+        achievement_percentage = (achievement_value / target_value * 100) if target_value > 0 else 0
+
+        with col1 if idx % 2 == 0 else col2:
+            st.markdown(
+                f"""
+                <div class="metric-box">
+                    <p class="metric-title">{target_col.split(' Target')[0]}</p>
+                    <p class="metric-value">{achievement_value:,.0f} / {target_value:,.0f}</p>
+                    <p class="metric-title">Achievement</p>
+                    <p class="metric-value">{achievement_percentage:.0f}%</p>
+                </div>
+                """,
+                unsafe_allow_html=True,
+            )
+
+    # Key Performance Metrics
     st.markdown('<div class="divider"></div>', unsafe_allow_html=True)
     st.markdown('<div class="section-header">Key Performance Metrics</div>', unsafe_allow_html=True)
 
@@ -187,20 +219,16 @@ with dashboard_tab:
                 <p class="metric-value">{td:,.0f}</p>
             </div>
             """, 
-            unsafe_allow_html=True,
+            unsafe_allow_html=True
         )
-
 # Compare Tab
-with compare_tab:
-    # Prepare data for comparison
-    compare_data = filtered_data.groupby("AC Name")[["Cash-in", "SGR Conversion"]].sum().reset_index()
+# Format numeric columns
+compare_data["Cash-in"] = compare_data["Cash-in"].apply(lambda x: f"{x:,.0f}")
+compare_data["SGR Conversion"] = compare_data["SGR Conversion"].apply(lambda x: f"{x:,.0f}")
 
-    # Format numeric columns
-    compare_data["Cash-in"] = compare_data["Cash-in"].apply(lambda x: f"{x:,.0f}")
-    compare_data["SGR Conversion"] = compare_data["SGR Conversion"].apply(lambda x: f"{x:,.0f}")
+# Reset index to remove default indexing
+compare_data = compare_data.reset_index(drop=True)
 
-    # Reset index to remove default indexing
-    compare_data = compare_data.reset_index(drop=True)
-
-    # Display table with built-in sorting (click column headers)
-    st.dataframe(compare_data, use_container_width=True)
+# Display table with built-in sorting (click column headers)
+st.markdown('<div class="section-header">Comparison Metrics</div>', unsafe_allow_html=True)
+st.dataframe(compare_data, use_container_width=True)
