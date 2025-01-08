@@ -222,13 +222,30 @@ with dashboard_tab:
             unsafe_allow_html=True
         )
 # Compare Tab
-# Format numeric columns
-compare_data["Cash-in"] = compare_data["Cash-in"].apply(lambda x: f"{x:,.0f}")
-compare_data["SGR Conversion"] = compare_data["SGR Conversion"].apply(lambda x: f"{x:,.0f}")
+with compare_tab:
+    # Prepare data for comparison
+    if not filtered_data.empty:
+        compare_data = (
+            filtered_data.groupby("AC Name")[["Cash-in", "SGR Conversion"]]
+            .sum()
+            .reset_index()
+        )
 
-# Reset index to remove default indexing
-compare_data = compare_data.reset_index(drop=True)
+        # Ensure columns exist before formatting
+        if "Cash-in" in compare_data.columns:
+            compare_data["Cash-in"] = compare_data["Cash-in"].apply(
+                lambda x: f"{x:,.0f}"
+            )
+        if "SGR Conversion" in compare_data.columns:
+            compare_data["SGR Conversion"] = compare_data["SGR Conversion"].apply(
+                lambda x: f"{x:,.0f}"
+            )
 
-# Display table with built-in sorting (click column headers)
-st.markdown('<div class="section-header">Comparison Metrics</div>', unsafe_allow_html=True)
-st.dataframe(compare_data, use_container_width=True)
+        # Reset index to remove default indexing
+        compare_data = compare_data.reset_index(drop=True)
+
+        # Display table with built-in sorting (click column headers)
+        st.dataframe(compare_data, use_container_width=True)
+    else:
+        st.warning("No data available for the selected filters.")
+
