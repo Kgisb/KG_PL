@@ -207,7 +207,8 @@ with dashboard_tab:
                 <p class="metric-title">TD</p>
                 <p class="metric-value">{td:,.0f}</p>
             </div>
-            """, unsafe_allow_html=True,
+            """, 
+            unsafe_allow_html=True,
         )
 
 # Compare Tab
