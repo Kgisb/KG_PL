@@ -101,33 +101,47 @@ with dashboard_tab:
     st.markdown('<div class="header-banner">📊 JetLearn: Interactive B2C Dashboard</div>', unsafe_allow_html=True)
 
     # Sidebar for Filters
-    st.sidebar.header("Filter Options")
-    ac_names = ["ALL"] + sorted(data['AC Name'].dropna().unique().tolist())
-    selected_ac_name = st.sidebar.selectbox("Select AC Name", ac_names)
+st.sidebar.header("Filter Options")
+ac_names = ["ALL"] + sorted(data['AC Name'].dropna().unique().tolist())
+selected_ac_name = st.sidebar.selectbox("Select AC Name", ac_names)
 
-    time_options = ["Today", "WK 1", "WK 2", "WK 3", "WK 4", "WK 5", "MTD"]
-    selected_time = st.sidebar.selectbox("Select Time Period", time_options)
+time_options = ["Today", "WK 1", "WK 2", "WK 3", "WK 4", "WK 5", "MTD"]
+selected_time = st.sidebar.selectbox("Select Time Period", time_options)
 
-    # Define time ranges
-    time_ranges = {
-        "Today": (datetime.now().date(), datetime.now().date()),
-        "WK 1": ("2025-01-01", "2025-01-06"),
-        "WK 2": ("2025-01-07", "2025-01-13"),
-        "WK 3": ("2025-01-14", "2025-01-20"),
-        "WK 4": ("2025-01-21", "2025-01-27"),
-        "WK 5": ("2025-01-28", "2025-01-31"),
-        "MTD": ("2025-01-01", datetime.now().date()),
-    }
+# Checkboxes for Math and Coding
+math_checked = st.sidebar.checkbox("Math", value=True)
+coding_checked = st.sidebar.checkbox("Coding", value=True)
 
-    start_date, end_date = time_ranges[selected_time]
-    filtered_data = data[
-        (data['Date'] >= pd.to_datetime(start_date)) & 
-        (data['Date'] <= pd.to_datetime(end_date))
-    ]
+# Define time ranges
+time_ranges = {
+    "Today": (datetime.now().date(), datetime.now().date()),
+    "WK 1": ("2025-01-01", "2025-01-06"),
+    "WK 2": ("2025-01-07", "2025-01-13"),
+    "WK 3": ("2025-01-14", "2025-01-20"),
+    "WK 4": ("2025-01-21", "2025-01-27"),
+    "WK 5": ("2025-01-28", "2025-01-31"),
+    "MTD": ("2025-01-01", datetime.now().date()),
+}
 
-    # Filter data by AC Name
-    if selected_ac_name != "ALL":
-        filtered_data = filtered_data[filtered_data['AC Name'] == selected_ac_name]
+start_date, end_date = time_ranges[selected_time]
+filtered_data = data[
+    (data['Date'] >= pd.to_datetime(start_date)) & 
+    (data['Date'] <= pd.to_datetime(end_date))
+]
+
+# Filter data by AC Name
+if selected_ac_name != "ALL":
+    filtered_data = filtered_data[filtered_data['AC Name'] == selected_ac_name]
+
+# Filter by Math and Coding
+if math_checked and not coding_checked:
+    filtered_data = filtered_data[filtered_data['Product'] == "Math"]
+elif coding_checked and not math_checked:
+    filtered_data = filtered_data[filtered_data['Product'] == "Coding"]
+# If both Math and Coding are checked, keep the entire dataset
+
+# Proceed with metrics calculation and display as before
+
 
     # Calculate metrics
     enrl = filtered_data['Enrl'].sum() if 'Enrl' in filtered_data.columns else 0
