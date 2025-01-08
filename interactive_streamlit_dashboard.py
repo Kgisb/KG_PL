@@ -207,5 +207,21 @@ with dashboard_tab:
                 <p class="metric-title">TD</p>
                 <p class="metric-value">{td:,.0f}</p>
             </div>
-            """,
-           
+            """, unsafe_allow_html=True,
+        )
+
+# Compare Tab
+with compare_tab:
+    # Prepare data for comparison
+    compare_data = filtered_data.groupby("AC Name")[["Cash-in", "SGR Conversion"]].sum().reset_index()
+
+    # Format numeric columns
+    compare_data["Cash-in"] = compare_data["Cash-in"].apply(lambda x: f"{x:,.0f}")
+    compare_data["SGR Conversion"] = compare_data["SGR Conversion"].apply(lambda x: f"{x:,.0f}")
+
+    # Reset index to remove default indexing
+    compare_data = compare_data.reset_index(drop=True)
+
+    # Display table with built-in sorting (click column headers)
+    st.dataframe(compare_data, use_container_width=True)
+
