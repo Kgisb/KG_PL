@@ -149,11 +149,7 @@ td_to_enrl = (enrl / td * 100) if td > 0 else 0
 
 # Display Key Metrics and Tables in Dashboard and Compare Tabs
 
-
-# Display Key Metrics and Tables in Dashboard and Compare Tabs
-
-
-    # Display Key Metrics
+# Display Key Metrics
     st.markdown('<div class="divider"></div>', unsafe_allow_html=True)
     st.markdown('<div class="section-header">Key Performance Metrics</div>', unsafe_allow_html=True)
 
