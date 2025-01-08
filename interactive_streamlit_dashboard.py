@@ -85,7 +85,7 @@ st.markdown(
     unsafe_allow_html=True
 )
 
- # Dashboard Tab
+# Dashboard Tab
 with dashboard_tab:
     # Header Banner
     st.markdown('<div class="header-banner">📊 JetLearn: Interactive B2C Dashboard</div>', unsafe_allow_html=True)
@@ -106,12 +106,12 @@ with dashboard_tab:
         "WK 3": ("2025-01-14", "2025-01-20"),
         "WK 4": ("2025-01-21", "2025-01-27"),
         "WK 5": ("2025-01-28", "2025-01-31"),
-         "MTD": ("2025-01-01", "2025-01-31"),
+        "MTD": ("2025-01-01", datetime.now().date()),
     }
 
     start_date, end_date = time_ranges[selected_time]
     filtered_data = data[
-        (data['Date'] >= pd.to_datetime(start_date)) &
+        (data['Date'] >= pd.to_datetime(start_date)) & 
         (data['Date'] <= pd.to_datetime(end_date))
     ]
 
@@ -123,17 +123,20 @@ with dashboard_tab:
     enrl = filtered_data['Enrl'].sum() if 'Enrl' in filtered_data.columns else 0
     overall_leads = filtered_data['Overall Leads'].sum() if 'Overall Leads' in filtered_data.columns else 0
     sgr_conversion = filtered_data['SGR Conversion'].sum() if 'SGR Conversion' in filtered_data.columns else 0
-    sgr_leads = filtered_data['SGR Leads'].sum() if 'SGR Leads' in filtered_data.columns else 0
+    sgr_conversion_target = filtered_data['SGR Conversion Target'].sum() if 'SGR Conversion Target' in filtered_data.columns else 0
 
-    # MLMC% and L2P%
+    # Updated SGR Conversion as a percentage of SGR Conversion Target
+    sgr_conversion_percentage = (
+        (sgr_conversion / sgr_conversion_target) * 100 if sgr_conversion_target > 0 else 0
+    )
+
+    # MLMC%, L2P%, TS, TD, Lead-to-TD, TD-to-Enrl
     mlmc = (enrl / overall_leads * 100) if overall_leads > 0 else 0
     l2p = (
         (enrl - sgr_conversion) / (overall_leads - sgr_leads) * 100
         if (overall_leads - sgr_leads) > 0
         else 0
     )
-
-    # TS, TD, Lead-to-TD, and TD-to-Enrl
     ts = filtered_data['TS'].sum() if 'TS' in filtered_data.columns else 0
     td = filtered_data['TD'].sum() if 'TD' in filtered_data.columns else 0
     lead_to_td = (td / overall_leads * 100) if overall_leads > 0 else 0
@@ -204,33 +207,5 @@ with dashboard_tab:
                 <p class="metric-title">TD</p>
                 <p class="metric-value">{td:,.0f}</p>
             </div>
-            """, unsafe_allow_html=True,
-        )
-
-    # Add View Filtered Data Option
-    with st.expander("🔍 View Filtered Data"):
-        st.markdown("### Filtered Data")
-        if filtered_data.empty:
-            st.info("No data available for the selected filters.")
-        else:
-            # Format numeric columns with commas
-            styled_df = filtered_data.copy()
-            for col in styled_df.select_dtypes(include=['float', 'int']).columns:
-                styled_df[col] = styled_df[col].apply(lambda x: f"{x:,.0f}")
-
-            st.dataframe(styled_df, use_container_width=True)
-
-# Compare Tab
-with compare_tab:
-    # Prepare data for comparison
-    compare_data = filtered_data.groupby("AC Name")[["Cash-in", "SGR Conversion"]].sum().reset_index()
-
-    # Format numeric columns
-    compare_data["Cash-in"] = compare_data["Cash-in"].apply(lambda x: f"{x:,.0f}")
-    compare_data["SGR Conversion"] = compare_data["SGR Conversion"].apply(lambda x: f"{x:,.0f}")
-
-    # Reset index to remove default indexing
-    compare_data = compare_data.reset_index(drop=True)
-
-    # Display table with built-in sorting (click column headers)
-    st.dataframe(compare_data, use_container_width=True)
+            """,
+           
