@@ -147,7 +147,8 @@ td = filtered_data['TD'].sum()
 lead_to_td = (td / overall_leads * 100) if overall_leads > 0 else 0
 td_to_enrl = (enrl / td * 100) if td > 0 else 0
 
-# Display Key Metrics and Tables in Dashboard and Compare Tabs
+# Display Key Metrics and Tables in Dashboard
+with dashboard_tab:
     st.markdown('<div class="divider"></div>', unsafe_allow_html=True)
     st.markdown('<div class="section-header">Key Performance Metrics</div>', unsafe_allow_html=True)
 
@@ -203,7 +204,3 @@ with compare_tab:
 
     # Display table with built-in sorting (click column headers)
     st.dataframe(compare_data, use_container_width=True)
-# Checkboxes for Math and Coding
-math_checked = st.sidebar.checkbox("Math", value=True)
-coding_checked = st.sidebar.checkbox("Coding", value=True)
-    
