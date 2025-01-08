@@ -147,6 +147,8 @@ td = filtered_data['TD'].sum()
 lead_to_td = (td / overall_leads * 100) if overall_leads > 0 else 0
 td_to_enrl = (enrl / td * 100) if td > 0 else 0
 
+# Display Key Metrics and Tables in Dashboard and Compare Tabs
+
 
 # Display Key Metrics and Tables in Dashboard and Compare Tabs
 
