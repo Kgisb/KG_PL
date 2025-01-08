@@ -230,4 +230,10 @@ with compare_tab:
 # Checkboxes for Math and Coding
 math_checked = st.sidebar.checkbox("Math", value=True)
 coding_checked = st.sidebar.checkbox("Coding", value=True)
+# Filter by Math and Coding
+if math_checked and not coding_checked:
+    filtered_data = filtered_data[filtered_data['Product'] == "Math"]
+elif coding_checked and not math_checked:
+    filtered_data = filtered_data[filtered_data['Product'] == "Coding"]
+# If both Math and Coding are checked, keep the entire dataset
 
