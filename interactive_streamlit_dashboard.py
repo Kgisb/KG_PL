@@ -85,22 +85,7 @@ st.markdown(
     unsafe_allow_html=True
 )
 
-# Checkboxes for Math and Coding
-math_checked = st.sidebar.checkbox("Math", value=True)
-coding_checked = st.sidebar.checkbox("Coding", value=True)
-# Filter by Math and Coding
-if math_checked and not coding_checked:
-    filtered_data = filtered_data[filtered_data['Product'] == "Math"]
-elif coding_checked and not math_checked:
-    filtered_data = filtered_data[filtered_data['Product'] == "Coding"]
-# If both Math and Coding are checked, keep the entire dataset
-
-# Dashboard Tab
-with dashboard_tab:
-    # Header Banner
-    st.markdown('<div class="header-banner">📊 JetLearn: Interactive B2C Dashboard</div>', unsafe_allow_html=True)
-
-    # Sidebar for Filters
+# Sidebar for Filters
 st.sidebar.header("Filter Options")
 ac_names = ["ALL"] + sorted(data['AC Name'].dropna().unique().tolist())
 selected_ac_name = st.sidebar.selectbox("Select AC Name", ac_names)
@@ -108,7 +93,7 @@ selected_ac_name = st.sidebar.selectbox("Select AC Name", ac_names)
 time_options = ["Today", "WK 1", "WK 2", "WK 3", "WK 4", "WK 5", "MTD"]
 selected_time = st.sidebar.selectbox("Select Time Period", time_options)
 
-# Checkboxes for Math and Coding
+# Checkboxes for Math and Coding (Only declare once here)
 math_checked = st.sidebar.checkbox("Math", value=True)
 coding_checked = st.sidebar.checkbox("Coding", value=True)
 
@@ -133,12 +118,16 @@ filtered_data = data[
 if selected_ac_name != "ALL":
     filtered_data = filtered_data[filtered_data['AC Name'] == selected_ac_name]
 
-# Filter by Math and Coding
+# Filter by Math and Coding (Apply filtering here)
 if math_checked and not coding_checked:
     filtered_data = filtered_data[filtered_data['Product'] == "Math"]
 elif coding_checked and not math_checked:
     filtered_data = filtered_data[filtered_data['Product'] == "Coding"]
 # If both Math and Coding are checked, keep the entire dataset
+
+# Proceed with metrics calculation and display as before
+# Continue with the remaining logic to calculate metrics and display tables
+
 
 # Proceed with metrics calculation and display as before
 
