@@ -227,4 +227,7 @@ with compare_tab:
 
     # Display table with built-in sorting (click column headers)
     st.dataframe(compare_data, use_container_width=True)
+# Checkboxes for Math and Coding
+math_checked = st.sidebar.checkbox("Math", value=True)
+coding_checked = st.sidebar.checkbox("Coding", value=True)
 
