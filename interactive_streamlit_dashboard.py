@@ -212,4 +212,3 @@ with compare_tab:
 # Checkboxes for Math and Coding
 math_checked = st.sidebar.checkbox("Math", value=True)
 coding_checked = st.sidebar.checkbox("Coding", value=True)
-
