@@ -124,6 +124,7 @@ with dashboard_tab:
     overall_leads = filtered_data['Overall Leads'].sum() if 'Overall Leads' in filtered_data.columns else 0
     sgr_conversion = filtered_data['SGR Conversion'].sum() if 'SGR Conversion' in filtered_data.columns else 0
     sgr_conversion_target = filtered_data['SGR Conversion Target'].sum() if 'SGR Conversion Target' in filtered_data.columns else 0
+    sgr_leads = filtered_data['SGR Leads'].sum() if 'SGR Leads' in filtered_data.columns else 0
 
     # Updated SGR Conversion as a percentage of SGR Conversion Target
     sgr_conversion_percentage = (
@@ -168,6 +169,7 @@ with dashboard_tab:
                 """,
                 unsafe_allow_html=True,
             )
+
 
     # Display Key Metrics
     st.markdown('<div class="divider"></div>', unsafe_allow_html=True)
