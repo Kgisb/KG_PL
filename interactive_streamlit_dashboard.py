@@ -123,67 +123,31 @@ if math_checked and not coding_checked:
     filtered_data = filtered_data[filtered_data['Product'] == "Math"]
 elif coding_checked and not math_checked:
     filtered_data = filtered_data[filtered_data['Product'] == "Coding"]
-# If both Math and Coding are checked, keep the entire dataset
 
-# If both Math and Coding are checked, keep the entire dataset
+# Calculate metrics
+enrl = filtered_data['Enrl'].sum()
+overall_leads = filtered_data['Overall Leads'].sum()
+sgr_conversion = filtered_data['SGR Conversion'].sum()
+sgr_conversion_target = filtered_data['SGR Conversion Target'].sum()
+sgr_leads = filtered_data['SGR Leads'].sum()
 
-# Proceed with metrics calculation and display as before
-# Continue with the remaining logic to calculate metrics and display tables
+# Updated SGR Conversion as a percentage of SGR Conversion Target
+sgr_conversion_percentage = (
+    (sgr_conversion / sgr_conversion_target) * 100 if sgr_conversion_target > 0 else 0
+)
 
+# MLMC%, L2P%, TS, TD, Lead-to-TD, TD-to-Enrl
+mlmc = (enrl / overall_leads * 100) if overall_leads > 0 else 0
+l2p = (
+    (enrl - sgr_conversion) / (overall_leads - sgr_leads) * 100
+    if (overall_leads - sgr_leads) > 0 else 0
+)
+ts = filtered_data['TS'].sum()
+td = filtered_data['TD'].sum()
+lead_to_td = (td / overall_leads * 100) if overall_leads > 0 else 0
+td_to_enrl = (enrl / td * 100) if td > 0 else 0
 
-# Proceed with metrics calculation and display as before
-
-
-    # Calculate metrics
-    enrl = filtered_data['Enrl'].sum() if 'Enrl' in filtered_data.columns else 0
-    overall_leads = filtered_data['Overall Leads'].sum() if 'Overall Leads' in filtered_data.columns else 0
-    sgr_conversion = filtered_data['SGR Conversion'].sum() if 'SGR Conversion' in filtered_data.columns else 0
-    sgr_conversion_target = filtered_data['SGR Conversion Target'].sum() if 'SGR Conversion Target' in filtered_data.columns else 0
-    sgr_leads = filtered_data['SGR Leads'].sum() if 'SGR Leads' in filtered_data.columns else 0
-
-    # Updated SGR Conversion as a percentage of SGR Conversion Target
-    sgr_conversion_percentage = (
-        (sgr_conversion / sgr_conversion_target) * 100 if sgr_conversion_target > 0 else 0
-    )
-
-    # MLMC%, L2P%, TS, TD, Lead-to-TD, TD-to-Enrl
-    mlmc = (enrl / overall_leads * 100) if overall_leads > 0 else 0
-    l2p = (
-        (enrl - sgr_conversion) / (overall_leads - sgr_leads) * 100
-        if (overall_leads - sgr_leads) > 0
-        else 0
-    )
-    ts = filtered_data['TS'].sum() if 'TS' in filtered_data.columns else 0
-    td = filtered_data['TD'].sum() if 'TD' in filtered_data.columns else 0
-    lead_to_td = (td / overall_leads * 100) if overall_leads > 0 else 0
-    td_to_enrl = (enrl / td * 100) if td > 0 else 0
-
-    # Display Target vs. Achievement
-    st.markdown('<div class="section-header">Target vs. Achievement</div>', unsafe_allow_html=True)
-    target_columns = {
-        "Cash-in Target": "Cash-in",
-        "Enrl Target": "Enrl",
-        "SGR Conversion Target": "SGR Conversion"
-    }
-
-    col1, col2 = st.columns(2)
-    for idx, (target_col, achievement_col) in enumerate(target_columns.items()):
-        target_value = filtered_data[target_col].sum() if target_col in filtered_data.columns else 0
-        achievement_value = filtered_data[achievement_col].sum() if achievement_col in filtered_data.columns else 0
-        achievement_percentage = (achievement_value / target_value * 100) if target_value > 0 else 0
-
-        with col1 if idx % 2 == 0 else col2:
-            st.markdown(
-                f"""
-                <div class="metric-box">
-                    <p class="metric-title">{target_col.split(' Target')[0]}</p>
-                    <p class="metric-value">{achievement_value:,.0f} / {target_value:,.0f}</p>
-                    <p class="metric-title">Achievement</p>
-                    <p class="metric-value">{achievement_percentage:.0f}%</p>
-                </div>
-                """,
-                unsafe_allow_html=True,
-            )
+# Display Key Metrics and Tables in Dashboard and Compare Tabs
 
 
     # Display Key Metrics
